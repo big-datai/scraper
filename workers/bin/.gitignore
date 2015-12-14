@@ -1,0 +1,31 @@
+*target*
+.cache
+*.jar
+*.war
+*.ear
+*.class*
+nohup.out
+log4j.log*
+# eclipse specific git ignore
+*.pydevproject
+.project
+.metadata
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.settings/
+.loadpath
+target/*
+# External tool builders
+.externalToolBuilders/
+wiser.pem
+# Locally stored "Eclipse launch configurations"
+*.launch
+*.log
+dependency-reduced-pom.xml

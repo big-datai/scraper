@@ -1,0 +1,66 @@
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.workers:workers:jar:1.0-SNAPSHOT
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: net.sourceforge.htmlunit:htmlunit:jar -> duplicate declaration of version 2.15 @ line 251, column 15
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building workers 1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+Downloading: https://repo.maven.apache.org/maven2/commons-logging/commons-logging/maven-metadata.xml
+Downloading: https://oss.sonatype.org/content/groups/public/commons-logging/commons-logging/maven-metadata.xml
+627/627 B               Downloaded: https://repo.maven.apache.org/maven2/commons-logging/commons-logging/maven-metadata.xml (627 B at 0.4 KB/sec)
+            Downloading: https://oss.sonatype.org/content/groups/public/commons-httpclient/commons-httpclient/maven-metadata.xml
+Downloading: https://repo.maven.apache.org/maven2/commons-httpclient/commons-httpclient/maven-metadata.xml
+2/2 KB               Downloaded: https://repo.maven.apache.org/maven2/commons-httpclient/commons-httpclient/maven-metadata.xml (2 KB at 6.8 KB/sec)
+         Downloading: https://repo.maven.apache.org/maven2/org/codehaus/jackson/jackson-core-asl/maven-metadata.xml
+Downloading: https://oss.sonatype.org/content/groups/public/org/codehaus/jackson/jackson-core-asl/maven-metadata.xml
+3/3 KB            Downloaded: https://repo.maven.apache.org/maven2/org/codehaus/jackson/jackson-core-asl/maven-metadata.xml (3 KB at 13.4 KB/sec)
+3/3 KB            Downloaded: https://oss.sonatype.org/content/groups/public/org/codehaus/jackson/jackson-core-asl/maven-metadata.xml (3 KB at 4.0 KB/sec)
+Downloading: https://oss.sonatype.org/content/groups/public/com/utils/utils/1.0-SNAPSHOT/maven-metadata.xml
+         [INFO] 
+[INFO] --- exec-maven-plugin:1.4.0:java (default-cli) @ workers ---
+2015-11-07 13:23:16,566 [com.workers.main.KMain.main()] ERROR   - Worker failed exception while reading from kafka Unable to connect to zookeeper server within timeout: 100000
+ERROR [] Worker failed exception while reading from kafka Unable to connect to zookeeper server within timeout: 100000
+0 [com.workers.main.KMain.main()] ERROR   - Worker failed exception while reading from kafka Unable to connect to zookeeper server within timeout: 100000
+[WARNING] thread Thread[metrics-meter-tick-thread-1,5,com.workers.main.KMain] was interrupted but is still alive after waiting at least 15000msecs
+[WARNING] thread Thread[metrics-meter-tick-thread-1,5,com.workers.main.KMain] will linger despite being asked to die via interruption
+[WARNING] thread Thread[metrics-meter-tick-thread-2,5,com.workers.main.KMain] will linger despite being asked to die via interruption
+[WARNING] NOTE: 2 thread(s) did not finish despite being asked to  via interruption. This is not a problem with exec:java, it is a problem with the running code. Although not serious, it should be remedied.
+[WARNING] Couldn't destroy threadgroup org.codehaus.mojo.exec.ExecJavaMojo$IsolatedThreadGroup[name=com.workers.main.KMain,maxpri=10]
+java.lang.IllegalThreadStateException
+	at java.lang.ThreadGroup.destroy(ThreadGroup.java:775)
+	at org.codehaus.mojo.exec.ExecJavaMojo.execute(ExecJavaMojo.java:328)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:134)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:208)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:153)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:145)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:116)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:80)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:51)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:128)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:307)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:193)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:106)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:862)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:286)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:197)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:289)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:229)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:415)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:356)
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 02:01 min
+[INFO] Finished at: 2015-11-07T13:23:31+02:00
+[INFO] Final Memory: 111M/14490M
+[INFO] ------------------------------------------------------------------------
