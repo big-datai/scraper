@@ -20,6 +20,7 @@ CREATE TABLE adwords.campaigns (
 
 CREATE TABLE adwords.adgroups (
 	campaign_id bigint,
+	group_id bigint,
 	name text,
 	PRIMARY KEY (campaign_id, name)
 );
