@@ -1,4 +1,4 @@
-package com.deepricer
+package ads.gen
 
 import akka.actor.ActorSystem
 import java.io.File

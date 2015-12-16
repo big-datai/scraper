@@ -66,20 +66,20 @@ public class GoogleAds implements Runnable {
 			wc.getOptions().setJavaScriptEnabled(true);
 			wc.getOptions().setCssEnabled(true);
 
-//			 final WebClient proxy = new WebClient(BrowserVersion.CHROME);
-//			 proxy.getOptions().setThrowExceptionOnScriptError(false);
-//			 proxy.getOptions().setJavaScriptEnabled(true);
-//			 proxy.getOptions().setCssEnabled(true);
-//			 HtmlPage shopping =
-//			 proxy.getPage("https://proxy-us.hide.me/go.php?u=50gfghVrLr0P1jtKmGoOQcTGKj5IBD7V%2FGNftsgj&b=5");
-//			 final HtmlForm form = shopping.getForms().get(0);
-//			 HtmlSubmitInput button =
-//			 form.getFirstByXPath("//*[@id=\"content\"]/form/input[2]");
-//			 final HtmlTextInput textField = form.getInputByName("u");
-//			 // Change the value of the text field
-//			 textField.setValueAttribute("https://www.google.com");
-//			 HtmlPage pageProxy = null;
-//			 pageProxy = button.click();
+			// final WebClient proxy = new WebClient(BrowserVersion.CHROME);
+			// proxy.getOptions().setThrowExceptionOnScriptError(false);
+			// proxy.getOptions().setJavaScriptEnabled(true);
+			// proxy.getOptions().setCssEnabled(true);
+			// HtmlPage shopping =
+			// proxy.getPage("https://proxy-us.hide.me/go.php?u=50gfghVrLr0P1jtKmGoOQcTGKj5IBD7V%2FGNftsgj&b=5");
+			// final HtmlForm form = shopping.getForms().get(0);
+			// HtmlSubmitInput button =
+			// form.getFirstByXPath("//*[@id=\"content\"]/form/input[2]");
+			// final HtmlTextInput textField = form.getInputByName("u");
+			// // Change the value of the text field
+			// textField.setValueAttribute("https://www.google.com");
+			// HtmlPage pageProxy = null;
+			// pageProxy = button.click();
 
 			HtmlPage pageProxy = wc.getPage("https://google.com");
 			while (true) {
@@ -150,8 +150,7 @@ public class GoogleAds implements Runnable {
 			systemExitOnBlocked(ms);
 		} catch (Exception e) {
 		}
-		String ptop = "//div[@class='_Ak c'  and @id='tads']//li[@class=\"ads-ad\"]", pshrink = "//div[@class=\"_PD\"]", pshopping = "//div[@class=\"_Dw\"]", pside = "//div[@class='_Ak']//li[@class=\"ads-ad\"]", pshrink2 = "//div[@class=\"_Dad\"]", 
-				pbottom = "//div[@id=\"bottomads\"]//div[@class='_Ak c']//li[@class=\"ads-ad\"]", pbottom2 = "//div[@class='_Ak c' and @id='tadsb']//li[@class=\"ads-ad\"]";
+		String ptop = "//div[@class='_Ak c'  and @id='tads']//li[@class=\"ads-ad\"]", pshrink = "//div[@class=\"_PD\"]", pshopping = "//div[@class=\"_Dw\"]", pside = "//div[@class='_Ak']//li[@class=\"ads-ad\"]", pshrink2 = "//div[@class=\"_Dad\"]", pbottom = "//div[@id=\"bottomads\"]//div[@class='_Ak c']//li[@class=\"ads-ad\"]", pbottom2 = "//div[@class='_Ak c' and @id='tadsb']//li[@class=\"ads-ad\"]";
 		List<HtmlListItem> adsTop = (List<HtmlListItem>) page2.getByXPath(ptop);
 		List<HtmlListItem> adsSide = (List<HtmlListItem>) page2.getByXPath(pside);
 		List<HtmlDivision> shoppings = (List<HtmlDivision>) page2.getByXPath(pshopping);
@@ -316,7 +315,7 @@ public class GoogleAds implements Runnable {
 			String isOnScreen = "NOSCREEN";
 			int location = 0;
 			for (int i = 0; i < list.size(); i++) {
-		//TODO CHANGE FOR NEW DOMAIN		
+				// TODO CHANGE FOR NEW DOMAIN
 				if (list.get(i).domain.toLowerCase().contains("itdevicesonline")
 						|| list.get(i).domain.toLowerCase().contains("water-softeners-filters")) {
 					location = i;
@@ -330,8 +329,8 @@ public class GoogleAds implements Runnable {
 			}
 			String line = me.mpn + ", " + me.price + ", suggestion, " + me.rating + ", " + me.details + ", ";
 			Map<String, String> map = new HashMap<String, String>();
-			//TODO CHANGE FOR NEW DOMAIN
-//			map.put("store_id", "IT_Devices_Online");
+			// TODO CHANGE FOR NEW DOMAIN
+			// map.put("store_id", "IT_Devices_Online");
 			map.put("store_id", me.upc);
 			map.put("product_label", me.mpn);
 			if ("SCREEN".equals(isOnScreen)) {
