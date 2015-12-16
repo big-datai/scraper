@@ -1,14 +1,11 @@
-package com.deepricer
+package com.deepricer.adwords
 
-import akka.actor.ActorSystem
-import java.io.File
 import java.lang.Boolean.getBoolean
-import java.net.URLClassLoader
-import java.util.jar.JarFile
-import com.google.api.ads.adwords.axis.v201506.cm.Campaign
 
-import scala.collection.immutable
-import scala.collection.JavaConverters._
+import akka.actor.{Props, ActorSystem}
+import com.deepricer.adwords.CampaignReadActor.FindAndAdd
+import com.deepricer.adwords.google.CampaignActor
+import com.deepricer.adwords.config.{AdWordsConfig, ConfigCassandraCluster}
 
 trait Bootable {
   /**
@@ -24,89 +21,35 @@ trait Bootable {
   def shutdown(): Unit
 }
 
-object Main {
+object Main extends App with ConfigCassandraCluster with AdWordsConfig {
+  import akka.actor.ActorDSL._
+  implicit lazy val system = ActorSystem()
+  val findAndAdd = system.actorOf(Props(new CampaignActor(OAuth2Credential.session)))
+  val scan = system.actorOf(Props(new CampaignReadActor(cluster, findAndAdd)))
+
+  // we don't want to bother with the ``ask`` pattern, so
+  // we set up sender that only prints out the responses to
+  // be implicitly available for ``tell`` to pick up.
+  implicit val _ = actor(new Act {
+    become {
+      case x => println(">>> " + x)
+    }
+  })
   private val quiet = getBoolean("akka.kernel.quiet")
 
   private def log(s: String) = if (!quiet) println(s)
 
-  def main(args: Array[String]) = {
-    val mainClass: String = System.getProperty("mainClass")
-//    if (mainClass == null) {
-//      log("[error] No boot classes specified")
-//      System.exit(1)
-//    }
-
-//    val campaigns: Array[Campaign] = CampaignService.findCampaign("").getEntries
+  override def main(args: Array[String]) = {
 
     log(banner)
     log("Starting Akka...")
     log("Running Akka " + ActorSystem.Version)
-
-    CampaignService.findCampaign("")
-//    val classLoader = createClassLoader()
-//
-//    Thread.currentThread.setContextClassLoader(classLoader)
-//
-//    val bootClasses: immutable.Seq[String] = immutable.Seq(mainClass)
-//    val bootables: immutable.Seq[Bootable] = bootClasses map { c ⇒ classLoader.loadClass(c).newInstance.asInstanceOf[Bootable] }
-//
-//    for (bootable ← bootables) {
-//      log("Starting up " + bootable.getClass.getName)
-//      bootable.startup()
-//    }
-//
-//    addShutdownHook(bootables)
-
+    scan ! FindAndAdd("www.bb.com")
     log("Successfully started Akka")
+
+    system.terminate()
   }
 
-  private def createClassLoader(): ClassLoader = {
-    if (ActorSystem.GlobalHome.isDefined) {
-      val home = ActorSystem.GlobalHome.get
-      val deploy = new File(home, "deploy")
-      if (deploy.exists) {
-        loadDeployJars(deploy)
-      } else {
-        log("[warning] No deploy dir found at " + deploy)
-        Thread.currentThread.getContextClassLoader
-      }
-    } else {
-      log("[warning] Akka home is not defined")
-      Thread.currentThread.getContextClassLoader
-    }
-  }
-
-  private def loadDeployJars(deploy: File): ClassLoader = {
-    val jars = deploy.listFiles.filter(_.getName.endsWith(".jar"))
-
-    val nestedJars = jars flatMap { jar ⇒
-      val jarFile = new JarFile(jar)
-      val jarEntries = jarFile.entries.asScala.toArray.filter(_.getName.endsWith(".jar"))
-      jarEntries map { entry ⇒ new File("jar:file:%s!/%s" format (jarFile.getName, entry.getName)) }
-    }
-
-    val urls = (jars ++ nestedJars) map { _.toURI.toURL }
-
-    urls foreach { url ⇒ log("Deploying " + url) }
-
-    new URLClassLoader(urls, Thread.currentThread.getContextClassLoader)
-  }
-
-  private def addShutdownHook(bootables: immutable.Seq[Bootable]): Unit = {
-    Runtime.getRuntime.addShutdownHook(new Thread(new Runnable {
-      def run = {
-        log("")
-        log("Shutting down Akka...")
-
-        for (bootable ← bootables) {
-          log("Shutting down " + bootable.getClass.getName)
-          bootable.shutdown()
-        }
-
-        log("Successfully shut down Akka")
-      }
-    }))
-  }
 
   private def banner = """
 ==============================================================================

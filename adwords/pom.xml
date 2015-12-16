@@ -1,10 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.adwords</groupId>
-    <artifactId>adswords</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <name>adwords</name> 
+    <groupId>com.deepricer.utils</groupId>
+    <artifactId>ads-words</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>${project.artifactId}</name>
     <description>AdWords Deepricer</description>
 
     <properties>
@@ -15,6 +15,8 @@
         <scala.compat.version>2.11</scala.compat.version>
         <scala.akka.version>2.4.1</scala.akka.version>
         <api-ads.version>2.8.0</api-ads.version>
+        <phantom.version>1.11.0</phantom.version>
+        <cassandra.driver.version>2.1.1</cassandra.driver.version>
     </properties>
 
     <dependencies>
@@ -28,20 +30,20 @@
             <artifactId>akka-actor_${scala.compat.version}</artifactId>
             <version>${scala.akka.version}</version>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-persistence_${scala.compat.version}</artifactId>
             <version>${scala.akka.version}</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-slf4j_${scala.compat.version}</artifactId>
             <version>${scala.akka.version}</version>
         </dependency>
 
-        <!-- Utils-->
+        <!-- Utils -->
         <dependency>
-            <groupId>com.utils</groupId>
+            <groupId>com.deepricer.utils</groupId>
             <artifactId>utils</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
@@ -61,6 +63,25 @@
             <artifactId>dfp-axis</artifactId>
             <version>RELEASE</version>
         </dependency>
+
+        <!-- Cassandra -->
+        <dependency>
+            <groupId>com.websudos</groupId>
+            <artifactId>phantom-dsl_${scala.compat.version}</artifactId>
+            <version>${phantom.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.datastax.cassandra</groupId>
+            <artifactId>cassandra-driver-core</artifactId>
+            <version>${cassandra.driver.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.xerial.snappy</groupId>
+                    <artifactId>snappy-java</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
 
         <!-- Test -->
         <dependency>
@@ -105,6 +126,7 @@
                                 <arg>-feature</arg>
                                 <arg>-language:postfixOps</arg>
                                 <arg>-language:implicitConversions</arg>
+                                <!--<arg>-Ylog-classpath</arg>-->
                             </args>
                         </configuration>
                     </execution>
