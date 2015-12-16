@@ -15,7 +15,7 @@ CREATE TABLE adwords.campaigns (
 	budget_amount decimal,
 	budget_period text,
 	budget_delivery_method text,
-	PRIMARY KEY (( store_id, id ), name)
+	PRIMARY KEY (store_id, id, name)
 );
 
 CREATE TABLE adwords.adgroups (
