@@ -129,7 +129,7 @@ public class GoogleTitleId implements Runnable {
 					}
 					if (!(bestCandid != null))
 						UConstants.log.error("### NO COMPETITORS FOR SEARCH TITLE : " + ms.getTitle());
-					// PUBLISHING STAGE
+					// PUBLISHING STAGE ggl
 					for (BigMessage m : messages) {
 						try {
 							Utils.postMessage(m, m_messPublisher);
