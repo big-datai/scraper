@@ -2,6 +2,7 @@ package com.workers.workers;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -359,6 +360,45 @@ public class GoogleAds implements Runnable {
 				map.put("company" + String.valueOf(c), i + 1 + "-" + m.rating + " - " + m.details + " - " + m.domain);
 				map.put("company" + String.valueOf(c) + "_price", m.totalPrice);
 			}
+			
+			//Suggested Price Part
+			List<Double> tempList = new LinkedList<Double>();
+			Double uBound = 0.0;
+			Double lBound = 0.0;
+			String myPrice = "";
+			String sugPrice = "";
+			for (int i = 0; i < list.size() && i < 8 && i < count; i++) {
+				
+				BigMessage m = list.get(i);
+				
+				if (m.domain.toLowerCase().contains("itdevicesonline")
+						||m.domain.toLowerCase().contains("water-softeners-filters")) {
+					uBound = Double.parseDouble(m.uBound);	
+					lBound = Double.parseDouble(m.lBound);
+					myPrice = m.totalPrice;
+					continue;
+					} else if (m.totalPrice.contains("non"))
+						{continue;} else 
+									{Double totPrice = Double.parseDouble(m.totalPrice);
+									tempList.add(totPrice);}	
+							
+			//	List() lst = list.get(i);
+			//	line += m.domain + ", " + m.totalPrice + ", ";
+		//		int c = i + 1;
+			//	map.put("company" + String.valueOf(c), i + 1 + "-" + m.rating + " - " + m.details + " - " + m.domain);
+				//map.put("company" + String.valueOf(c) + "_price", m.totalPrice);
+			}
+			Collections.reverse(tempList);
+			if (tempList.size()>0){
+						Double minPrice = tempList.get(1);
+						if (minPrice>lBound && minPrice<uBound)
+							{sugPrice=String.valueOf(minPrice+1);}
+						else if (minPrice==lBound) {sugPrice=String.valueOf(minPrice);}
+						else if (minPrice>lBound && (0.8*minPrice)<=uBound) {sugPrice=String.valueOf(uBound);}
+						else sugPrice="non";			
+			}else sugPrice=myPrice;
+			map.put("suggestion", sugPrice);	
+			
 			Statement statement = QueryBuilder.insertInto("demo", "csv_products").values(map.keySet().toArray(new String[0]),
 					map.values().toArray(new String[0]));
 			System.out.println(counter.addAndGet(1) + " ++++" + line);
