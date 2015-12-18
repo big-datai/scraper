@@ -11,5 +11,5 @@ public class Message {
 			category = "", brand = "", mpn = "", upc = "", sku = "",
 			otherID = "", rating = "", details = "",basePrice = "" ,priceAddition = "",priceAdditionText = "",
 			totalPrice = "", shipping = "", competitors = "", gNotParsed = "",indexOfPattern="",indexOfPatternText="",
-			currency="", locale="", storeId ="", firstGglPrice="", gglName="", condition="";
+			currency="", locale="", storeId ="", firstGglPrice="", gglName="", condition="", uBound="", lBound="";
 }
