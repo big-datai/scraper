@@ -35,3 +35,5 @@ target/*
 *.launch
 *.log
 dependency-reduced-pom.xml
+adwords/.classpath
+adwords/.settings/org.eclipse.jdt.core.prefs
