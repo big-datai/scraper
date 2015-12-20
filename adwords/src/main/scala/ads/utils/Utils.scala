@@ -356,7 +356,7 @@ object Utils {
 
   }
 
-  def updateKeyword(adWordsServices: AdWordsServices, session: AdWordsSession, adGroupId: java.lang.Long, keywordId: java.lang.Long) {
+  def updateKeyword(adWordsServices: AdWordsServices, session: AdWordsSession, adGroupId: java.lang.Long, keywordId: java.lang.Long, bidAmount : Long) {
     val adGroupCriterionService = adWordsServices.get(session, classOf[AdGroupCriterionServiceInterface])
     //selector.setFields(new String[] {"Id", "AdGroupId", "MatchType", "KeywordText", "FirstPageCpc"});
     val criterion = new Criterion()
@@ -368,7 +368,7 @@ object Utils {
 
     val biddingStrategyConfiguration = new BiddingStrategyConfiguration()
     val bid = new CpcBid()
-    bid.setBid(new Money(null, 10000000L))
+    bid.setBid(new Money(null, bidAmount))
     biddingStrategyConfiguration.setBids(Array(bid))
     // biddingStrategyConfiguration.setBiddingStrategyName("")
     biddableAdGroupCriterion.setBiddingStrategyConfiguration(biddingStrategyConfiguration)
