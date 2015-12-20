@@ -21,64 +21,7 @@ object CampaignService {
     session
   }
 
-  def findCampaign(name: String) = {
-
-    val session: AdWordsSession = getSession
-
-    // Construct a AdWords service factory, which can only be used once per thread,
-    // but should be reused as much as possible.
-    val adWordsServices: AdWordsServices = new AdWordsServices
-
-    // Get the CampaignService.
-    val campaignService: CampaignServiceInterface = adWordsServices.get(session, classOf[CampaignServiceInterface])
-
-    // Get the AdGroupBidModifierService.
-    val bidModifierService: AdGroupBidModifierServiceInterface =
-      adWordsServices.get(session, classOf[AdGroupBidModifierServiceInterface])
-
-    // Create selector.
-    val builder = new SelectorBuilder()
-    //    val selector: Selector = builder.fields("CampaignName", "CampaignId", "AdGroupId", "Id", "BidModifier")
-    ////      .orderAscBy(CampaignField.Name)
-    //      .offset(0)
-    //      .limit(100)
-    //      .build()
-    //selector.setFields("CampaignId", "AdGroupId", "Id", "BidModifier")
-    //    selector.setPaging(new Paging(0, 10))
-
-    // Make a 'get' request.
-    //    val page: AdGroupBidModifierPage = bidModifierService.get(selector)
-    //
-    //    // Display bid modifiers.
-    //    if (page.getEntries != null) {
-    //      for (modifier <- page.getEntries) {
-    //        val value = Option(modifier.getBidModifier).getOrElse("unset")
-    //        println(s"Campaign ID ${modifier.getCampaignId}, AdGroup ID ${modifier.getAdGroupId}, Criterion ID ${modifier.getCriterion.getId}"
-    //          + s" has ad group level modifier: ${value.toString}")
-    //      }
-    //    } else {
-    //      println("No bid modifiers were found.")
-    //    }
-    //    
-    val selector: Selector = builder.fields("CampaignName", "CampaignId")
-      //      .orderAscBy(CampaignField.Name)
-      .offset(0)
-      .limit(100)
-      .build()
-    val page = campaignService.get(selector)
-    // Display campaigns.
-    var res: Campaign = null
-    if (page.getEntries() != null) {
-      for (campaign <- page.getEntries) {
-        if (name.equals(campaign.getName)) {
-          res = campaign
-        }
-
-      }
-    }
-
-    res
-  }
+  
 
   def one() = {
 
@@ -120,4 +63,5 @@ object CampaignService {
     }
 
   }
+  
 }

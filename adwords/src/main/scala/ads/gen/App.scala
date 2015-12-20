@@ -42,7 +42,7 @@ object Main {
     log("Starting Akka...")
     log("Running Akka " + ActorSystem.Version)
 
-    CampaignService.findCampaign("")
+//    CampaignService.findCampaign("")
 //    val classLoader = createClassLoader()
 //
 //    Thread.currentThread.setContextClassLoader(classLoader)

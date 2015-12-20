@@ -31,10 +31,9 @@ local.properties
 target/*
 # External tool builders
 .externalToolBuilders/
-wiser.pem
 # Locally stored "Eclipse launch configurations"
 *.launch
 *.log
 dependency-reduced-pom.xml
-/target
-/target
+adwords/.classpath
+adwords/.settings/org.eclipse.jdt.core.prefs
