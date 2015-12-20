@@ -1,9 +1,9 @@
 package com.deepricer.adwords.google
 
-import akka.actor.Actor
+import akka.actor.{ActorLogging, Actor}
 import akka.actor.Actor.Receive
-import com.deepricer.adwords.domain.AdTextCassandra
-import com.deepricer.adwords.google.AdTextActor.{SetAdText, AddAdText}
+import com.deepricer.adwords.domain.{CSVLine, AdTextCassandra}
+import com.deepricer.adwords.google.AdTextActor.AddAdText
 import com.google.api.ads.adwords.axis.factory.AdWordsServices
 import com.google.api.ads.adwords.axis.v201509.cm._
 import com.google.api.ads.adwords.lib.client.AdWordsSession
@@ -13,28 +13,28 @@ import com.google.api.ads.adwords.lib.client.AdWordsSession
  */
 
 object AdTextActor {
-  case class AddAdText(adTextCassandra: AdTextCassandra)
-  case class SetAdText(adTextCassandra: AdTextCassandra)
+  case class AddAdText(csvLine: CSVLine, groupId: Long)
+//  case class SetAdText(adTextCassandra: AdTextCassandra)
 }
 
-class AdTextActor(session: AdWordsSession) extends Actor {
+class AdTextActor(session: AdWordsSession) extends Actor with ActorLogging {
 
-  def adText(adTextCassandra: AdTextCassandra, operator: Operator) = {
+  def adText(csvLine: CSVLine, groupId: Long, operator: Operator) = {
     val adWordsServices: AdWordsServices = new AdWordsServices
     val adGroupAdService: AdGroupAdServiceInterface =
       adWordsServices.get(session, classOf[AdGroupAdServiceInterface])
 
     // Create text ads.
     val textAd = new TextAd
-    textAd.setHeadline(adTextCassandra.headline)
-    textAd.setDescription1(adTextCassandra.desc1.getOrElse(""))
-    textAd.setDescription2(adTextCassandra.desc2.getOrElse(""))
-    textAd.setDisplayUrl(adTextCassandra.displayUrl)
-    textAd.setFinalUrls(Array[String] {adTextCassandra.finalUrl})
+    textAd.setHeadline(csvLine.adHeadline)
+    textAd.setDescription1("")
+    textAd.setDescription2("")
+    textAd.setDisplayUrl(csvLine.adDisplayUrl)
+    textAd.setFinalUrls(Array[String] {csvLine.adFinalUrl})
 
     // Create ad group ad.
     val textAdGroupAd = new AdGroupAd
-    textAdGroupAd.setAdGroupId(adTextCassandra.groupId)
+    textAdGroupAd.setAdGroupId(groupId)
     textAdGroupAd.setAd(textAd)
 
     // You can optionally provide these field(s).
@@ -49,7 +49,7 @@ class AdTextActor(session: AdWordsSession) extends Actor {
   }
 
   override def receive: Receive = {
-    case AddAdText(adTextCassandra: AdTextCassandra) => adText(adTextCassandra, Operator.ADD)
-    case SetAdText(adTextCassandra: AdTextCassandra) => adText(adTextCassandra, Operator.SET)
+    case AddAdText(csvLine: CSVLine, groupId: Long) => adText(csvLine, groupId, Operator.ADD)
+//    case SetAdText(adTextCassandra: AdTextCassandra) => adText(adTextCassandra, Operator.SET)
   }
 }
