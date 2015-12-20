@@ -59,7 +59,7 @@ object Utils {
     val adWordsServices: AdWordsServices = new AdWordsServices
     // Get the CampaignService.
     val campaignService = adWordsServices.get(session, classOf[CampaignServiceInterface]);
-    val campaign = findCampaign("Google Build")
+    val campaign = findCampaign("itdeviceonline")
 
     println(campaign.getName + " id : " + campaign.getId)
     showDataOnCampaign(campaign.getId.toString())
