@@ -53,6 +53,7 @@ import com.google.api.ads.adwords.axis.v201509.cm.KeywordMatchType
 import com.google.api.ads.adwords.lib.selectorfields.v201509.cm.AdGroupField
 import java.util.ArrayList
 import scala.collection.JavaConverters._
+import java.util.HashMap
 
 object Utils {
 
@@ -119,7 +120,8 @@ object Utils {
   //  }
 
   
-   def runExample(adWordsServices: AdWordsServices, session: AdWordsSession, word:String) {
+   def getKeyWordSuggetions(adWordsServices: AdWordsServices, session: AdWordsSession, word:String) ={
+    val map=new HashMap[String,String]
     val targetingIdeaService = adWordsServices.get(session, classOf[TargetingIdeaServiceInterface])
     val selector = new TargetingIdeaSelector()
     selector.setRequestType(RequestType.IDEAS)
@@ -130,7 +132,7 @@ object Utils {
     paging.setNumberResults(10)
     selector.setPaging(paging)
     val relatedToQuerySearchParameter = new RelatedToQuerySearchParameter()
-    relatedToQuerySearchParameter.setQueries(Array(word))
+    relatedToQuerySearchParameter.setQueries(Array("["+word+"]"))
     val languageParameter = new LanguageSearchParameter()
     val english = new Language()
     english.setId(1000L)
@@ -152,10 +154,12 @@ object Utils {
           averageMonthlySearches + 
           "' was found with categories: " + 
           categoriesString)
+        map.put(keyword.getValue, averageMonthlySearches.toString)
       }
     } else {
       println("No related keywords were found.")
     }
+    map
   }
   def iterateGroups(adWordsServices: AdWordsServices, session: AdWordsSession, campaignId: java.lang.Long) {
     val adGroupService = adWordsServices.get(session, classOf[AdGroupServiceInterface])
@@ -175,9 +179,10 @@ object Utils {
           //put login on adgroup level
 
           val keywords = getKeywords(adWordsServices, session, adGroup.getId)
+          
           for (word <- keywords.asScala) {
             println(word)
-            runExample(adWordsServices, session, word)
+           val res= getKeyWordSuggetions(adWordsServices, session, word)
           }
           println("Ad group with name \"" + adGroup.getName + "\" and id \"" +
             adGroup.getId +
