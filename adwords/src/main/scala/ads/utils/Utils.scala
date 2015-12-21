@@ -50,6 +50,10 @@ import com.google.api.ads.adwords.lib.utils.ReportDownloadResponseException
 import com.google.api.ads.adwords.lib.utils.v201509.ReportDownloader
 import com.google.api.ads.adwords.lib.jaxb.v201509.DownloadFormat
 import com.google.api.ads.adwords.axis.v201509.cm.KeywordMatchType
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import com.google.common.base.Splitter
+import com.google.common.primitives.Longs
 
 object Utils {
 
@@ -60,8 +64,11 @@ object Utils {
     // Get the CampaignService.
     val campaignService = adWordsServices.get(session, classOf[CampaignServiceInterface]);
     val campaign = findCampaign("itdeviceonline")
-
     println(campaign.getName + " id : " + campaign.getId)
+    updateCampaignBids(adWordsServices, session, campaign.getId)
+    //updateKeywordBid(adWordsServices, session, 23716284536L, 142713060296L, 10000L)
+    //AdGroupId: 23716284536 AdGroupName: 003-0508-02 Id: 142713060296 bidAmount: 0
+    /*
     showDataOnCampaign(campaign.getId.toString())
     val bidModifierService: AdGroupBidModifierServiceInterface = adWordsServices.get(session, classOf[AdGroupBidModifierServiceInterface])
     val builder = new SelectorBuilder()
@@ -82,7 +89,7 @@ object Utils {
     //estimateTrafic(adGroupId, criterionId, "", adWordsServices, session)
     println("---     -  - - - - testing functions - -------- ---- ")
     //getKeywords(adWordsServices, session, adGroupId)
-    val keywordId = 3478391383L
+    //val keywordId = 3478391383L
     //updateKeyword(adWordsServices, session, adGroupId, keywordId)
     //AverageCpc   AveragePosition  Conversions  CpcBid ValuePerConversion
     //reportFields(adWordsServices, session)
@@ -90,7 +97,93 @@ object Utils {
     //getCriteriaReport(session, "criteia")
     //estimates(adWordsServices, session)
     //estimateTop(adGroupId,"dynamic prices","http://deepricer.com")
-    getKeywordReport(session, "keywords")
+    //getKeywordReport(session, "keywords")
+    */
+  }
+  def updateKeywordBid(adWordsServices: AdWordsServices, session: AdWordsSession, adGroupId: java.lang.Long, keywordId: java.lang.Long, bidAmount: Long) {
+    //Updates the CPC bid for a given keyword and adgroup
+    val adGroupCriterionService = adWordsServices.get(session, classOf[AdGroupCriterionServiceInterface])
+    val criterion = new Criterion()
+    criterion.setId(keywordId)
+    var biddableAdGroupCriterion = new BiddableAdGroupCriterion()
+    biddableAdGroupCriterion.setAdGroupId(adGroupId)
+    biddableAdGroupCriterion.setCriterion(criterion)
+
+    val biddingStrategyConfiguration = new BiddingStrategyConfiguration()
+    val bid = new CpcBid()
+    bid.setBid(new Money(null, bidAmount))
+    biddingStrategyConfiguration.setBids(Array(bid))
+    // biddingStrategyConfiguration.setBiddingStrategyName("")
+    biddableAdGroupCriterion.setBiddingStrategyConfiguration(biddingStrategyConfiguration)
+
+    val operation = new AdGroupCriterionOperation()
+    operation.setOperand(biddableAdGroupCriterion)
+    operation.setOperator(Operator.SET)
+    val operations = Array(operation)
+    val result = adGroupCriterionService.mutate(operations)
+
+    for (adGroupCriterionResult <- result.getValue if adGroupCriterionResult.isInstanceOf[BiddableAdGroupCriterion]) {
+      biddableAdGroupCriterion = adGroupCriterionResult.asInstanceOf[BiddableAdGroupCriterion]
+      val newBid = biddableAdGroupCriterion.getBiddingStrategyConfiguration()
+        .getBids().filter { bid => bid.getBidsType.equals("CpcBid") }.apply(0).asInstanceOf[CpcBid]
+        .getBid
+        .getMicroAmount
+
+      println("Ad group criterion with ad group id \"" + biddableAdGroupCriterion.getAdGroupId +
+        "\", criterion id \"" +
+        biddableAdGroupCriterion.getCriterion +
+        "\", type \"" +
+        biddableAdGroupCriterion.getCriterion.getCriterionType +
+        "\", and bid \"" +
+        newBid +
+        "\", first page bid price \"" +
+        biddableAdGroupCriterion.getBiddingStrategyConfiguration() +
+        "\" was updated.")
+    }
+  }
+
+  def updateCampaignBids(adWordsServices: AdWordsServices, session: AdWordsSession, campaignId: Long) {
+    //Updates the CPC bids for a given campaign
+    // current bid logic is : newBid = TopOfPageCpc*0.8
+    val query = "SELECT  AdGroupId,  AdGroupName, Id, QualityScore, Clicks, TopOfPageCpc, FirstPageCpc FROM KEYWORDS_PERFORMANCE_REPORT WHERE CampaignId =" + campaignId
+    val reportingConfiguration = new ReportingConfiguration.Builder().skipReportHeader(true)
+      .skipColumnHeader(true)
+      .skipReportSummary(true)
+      .includeZeroImpressions(true)
+      .build()
+    session.setReportingConfiguration(reportingConfiguration)
+    var reader: BufferedReader = null
+    try {
+      val response = new ReportDownloader(session).downloadReport(query, DownloadFormat.CSV)
+      reader = new BufferedReader(new InputStreamReader(response.getInputStream))
+      var line: String = reader.readLine()
+      val splitter = Splitter.on(',')
+      while (Option(line).isDefined) {
+        println(line)
+        val splitedLine = splitter.splitToList(line)
+        val AdGroupId = Longs.tryParse(splitedLine.get(0))
+        val AdGroupName = splitedLine.get(1)
+        val Id = Longs.tryParse(splitedLine.get(2))
+        val QualityScore = splitedLine.get(3)
+        val Clicks = splitedLine.get(4)
+        val TopOfPageCpc = Longs.tryParse(splitedLine.get(5))
+        val FirstPageCpc = Longs.tryParse(splitedLine.get(6))
+        val bidAmount = {
+          if (TopOfPageCpc != 0L)
+            (TopOfPageCpc * 0.8).floor.toLong
+          else
+            FirstPageCpc.toLong
+        }
+        println("TopOfPageCpc: " + TopOfPageCpc)
+        println("AdGroupId: " + AdGroupId + " AdGroupName: " + AdGroupName + " Id: " + Id + " bidAmount: " + bidAmount)
+        updateKeywordBid(adWordsServices, session, AdGroupId, Id, bidAmount)
+        line = reader.readLine()
+      }
+    } finally {
+      if (reader != null) {
+        reader.close()
+      }
+    }
   }
 
   //  def estimateTop(adGroupId:Long, keywordT:String,url:String){
@@ -264,6 +357,7 @@ object Utils {
         e)
     }
   }
+
   def downloadReports(session: AdWordsSession, reportFile: String) {
     import com.google.api.ads.adwords.lib.client.AdWordsSession
     import com.google.api.ads.adwords.lib.client.reporting.ReportingConfiguration
@@ -356,7 +450,7 @@ object Utils {
 
   }
 
-  def updateKeyword(adWordsServices: AdWordsServices, session: AdWordsSession, adGroupId: java.lang.Long, keywordId: java.lang.Long, bidAmount : Long) {
+  def updateKeyword(adWordsServices: AdWordsServices, session: AdWordsSession, adGroupId: java.lang.Long, keywordId: java.lang.Long, bidAmount: Long) {
     val adGroupCriterionService = adWordsServices.get(session, classOf[AdGroupCriterionServiceInterface])
     //selector.setFields(new String[] {"Id", "AdGroupId", "MatchType", "KeywordText", "FirstPageCpc"});
     val criterion = new Criterion()
