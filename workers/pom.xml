@@ -7,28 +7,6 @@
 	<version>1.0-SNAPSHOT</version>
 	<name>workers</name>
 	<url>http://maven.apache.org</url>
-	<!-- <pluginRepositories> <pluginRepository> <id>scala-tools.org</id> <name>Scala-tools 
-		Maven2 Repository</name> <url>http://scala-tools.org/repo-releases</url> 
-		</pluginRepository> </pluginRepositories> <properties> <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> 
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding> 
-		<app.main.class>com.workers.main.ESMain</app.main.class> <maven.compile.source>1.7</maven.compile.source> 
-		<maven.compile.target>1.7</maven.compile.target> <powermock.version>1.3.1</powermock.version> 
-		</properties> <build> <plugins> <plugin> <groupId>org.apache.maven.plugins</groupId> 
-		<artifactId>maven-surefire-plugin</artifactId> <configuration> <argLine>-Xmx512m 
-		-XX:MaxPermSize=256m</argLine> </configuration> </plugin> <plugin> <groupId>org.scala-tools</groupId> 
-		<artifactId>maven-scala-plugin</artifactId> <version>2.15.2</version> <executions> 
-		<execution> <goals> <goal>compile</goal> <goal>testCompile</goal> </goals> 
-		</execution> </executions> <configuration> <sourceDir>src/main/java</sourceDir> 
-		<jvmArgs> <jvmArg>-Xms1g</jvmArg> <jvmArg>-Xmx3g</jvmArg> </jvmArgs> </configuration> 
-		</plugin> <plugin> <artifactId>maven-compiler-plugin</artifactId> <version>3.0</version> 
-		<configuration> <source>${maven.compile.source}</source> <target>${maven.compile.target}</target> 
-		</configuration> </plugin> <plugin> <groupId>org.apache.maven.plugins</groupId> 
-		<artifactId>maven-shade-plugin</artifactId> <version>1.7.1</version> <executions> 
-		<execution> <phase>package</phase> <goals> <goal>shade</goal> </goals> <configuration> 
-		<filters> <filter> <artifact>*:*</artifact> <excludes> <exclude>META-INF/*.SF</exclude> 
-		<exclude>META-INF/*.DSA</exclude> <exclude>META-INF/*.RSA</exclude> </excludes> 
-		</filter> </filters> </configuration> </execution> </executions> </plugin> 
-		</plugins> <finalName>workers</finalName> </build> -->
 	<repositories>
 		<repository>
 			<id>sonatype</id>
@@ -96,19 +74,6 @@
 			<artifactId>log4j</artifactId>
 			<version>1.2.17</version>
 		</dependency>
-
-		<!-- <dependency> <groupId>org.mockito</groupId> <artifactId>mockito-all</artifactId> 
-			<version>1.9.5</version> </dependency> <dependency> <groupId>org.powermock.modules</groupId> 
-			<artifactId>powermock-module-junit4</artifactId> <version>${powermock.version}</version> 
-			</dependency> <dependency> <groupId>org.powermock.api</groupId> <artifactId>powermock-api-mockito</artifactId> 
-			<version>${powermock.version}</version> </dependency> <dependency> <groupId>org.elasticsearch</groupId> 
-			<artifactId>elasticsearch-hadoop</artifactId> <version>2.1.0.Beta3</version> 
-			</dependency> <dependency> <groupId>org.scala-lang</groupId> <artifactId>scala-library</artifactId> 
-			<version>2.10.4</version> <scope>provided</scope> </dependency> <dependency> 
-			<groupId>org.apache.spark</groupId> <artifactId>spark-core_2.10</artifactId> 
-			<version>1.3.0</version> </dependency> <dependency> <groupId>org.apache.spark</groupId> 
-			<artifactId>spark-mllib_2.10</artifactId> <version>1.3.0</version> <scope>provided</scope> 
-			</dependency> -->
 		<dependency>
 			<groupId>com.typesafe.play</groupId>
 			<artifactId>play-json_2.11</artifactId>

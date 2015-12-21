@@ -50,10 +50,17 @@ import com.google.api.ads.adwords.lib.utils.ReportDownloadResponseException
 import com.google.api.ads.adwords.lib.utils.v201509.ReportDownloader
 import com.google.api.ads.adwords.lib.jaxb.v201509.DownloadFormat
 import com.google.api.ads.adwords.axis.v201509.cm.KeywordMatchType
+
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import com.google.common.base.Splitter
 import com.google.common.primitives.Longs
+
+import com.google.api.ads.adwords.lib.selectorfields.v201509.cm.AdGroupField
+import java.util.ArrayList
+import scala.collection.JavaConverters._
+import java.util.HashMap
+
 
 object Utils {
 
@@ -63,6 +70,7 @@ object Utils {
     val adWordsServices: AdWordsServices = new AdWordsServices
     // Get the CampaignService.
     val campaignService = adWordsServices.get(session, classOf[CampaignServiceInterface]);
+
     val campaign = findCampaign("itdeviceonline")
     println(campaign.getName + " id : " + campaign.getId)
     updateCampaignBids(adWordsServices, session, campaign.getId)
@@ -70,9 +78,11 @@ object Utils {
     //AdGroupId: 23716284536 AdGroupName: 003-0508-02 Id: 142713060296 bidAmount: 0
     /*
     showDataOnCampaign(campaign.getId.toString())
+    iterateGroups(adWordsServices, session, 352064696L)
     val bidModifierService: AdGroupBidModifierServiceInterface = adWordsServices.get(session, classOf[AdGroupBidModifierServiceInterface])
     val builder = new SelectorBuilder()
-    val selector: Selector = builder.fields("CampaignName", "CampaignId", "AdGroupId", "Id", "BidModifier", "KeywordText", "FirstPageCpc").contains("CampaignName", "itdeviceonline")
+    val selector: Selector = builder.fields("CampaignName", "CampaignId", "AdGroupId", "Id", "BidModifier", "KeywordText", "FirstPageCpc")
+      .contains("CampaignName", "itdeviceonline")
       //      .orderAscBy(CampaignField.Name)
       .offset(0)
       .limit(100)
@@ -81,11 +91,7 @@ object Utils {
 
     //createAdGroup("mpn", 352064696, adWordsServices, session)
     val adGroupId = 23232312296L
-    //23232312776L 23232312656L    23232312416L  23232312296L 23232312176L
-    //Keyword with text 'retail competitive analysis', match type 'BROAD', criteria type 'KEYWORD', and ID 682811828 was found.
-    //Keyword with text 'sample competitive analysis', match type 'BROAD', criteria type 'KEYWORD', and ID 625268409 was found.
-    //Keyword with text 'website competitive analysis', match type 'BROAD', criteria type 'KEYWORD', and ID 263979756 was found.
-    //val criterionId = 30001L
+
     //estimateTrafic(adGroupId, criterionId, "", adWordsServices, session)
     println("---     -  - - - - testing functions - -------- ---- ")
     //getKeywords(adWordsServices, session, adGroupId)
@@ -98,6 +104,7 @@ object Utils {
     //estimates(adWordsServices, session)
     //estimateTop(adGroupId,"dynamic prices","http://deepricer.com")
     //getKeywordReport(session, "keywords")
+
     */
   }
   def updateKeywordBid(adWordsServices: AdWordsServices, session: AdWordsSession, adGroupId: java.lang.Long, keywordId: java.lang.Long, bidAmount: Long) {
@@ -185,7 +192,6 @@ object Utils {
       }
     }
   }
-
   //  def estimateTop(adGroupId:Long, keywordT:String,url:String){
   //    
   //    val keyword = new Keyword()
@@ -209,7 +215,85 @@ object Utils {
   //    val operations = Array(operation)
   //    val result = adGroupCriterionService.mutate(operations)
   //  }
-  def estimates(adWordsServices: AdWordsServices, session: AdWordsSession) {
+
+  
+   def getKeyWordSuggetions(adWordsServices: AdWordsServices, session: AdWordsSession, word:String) ={
+    val map=new HashMap[String,String]
+    val targetingIdeaService = adWordsServices.get(session, classOf[TargetingIdeaServiceInterface])
+    val selector = new TargetingIdeaSelector()
+    selector.setRequestType(RequestType.IDEAS)
+    selector.setIdeaType(IdeaType.KEYWORD)
+    selector.setRequestedAttributeTypes(Array(AttributeType.KEYWORD_TEXT, AttributeType.SEARCH_VOLUME, AttributeType.CATEGORY_PRODUCTS_AND_SERVICES))
+    val paging = new Paging()
+    paging.setStartIndex(0)
+    paging.setNumberResults(10)
+    selector.setPaging(paging)
+    val relatedToQuerySearchParameter = new RelatedToQuerySearchParameter()
+    relatedToQuerySearchParameter.setQueries(Array("["+word+"]"))
+    val languageParameter = new LanguageSearchParameter()
+    val english = new Language()
+    english.setId(1000L)
+    languageParameter.setLanguages(Array(english))
+    selector.setSearchParameters(Array(relatedToQuerySearchParameter, languageParameter))
+    val page = targetingIdeaService.get(selector)
+    if (page.getEntries != null && page.getEntries.length > 0) {
+      for (targetingIdea <- page.getEntries) {
+        val data = Maps.toMap(targetingIdea.getData)
+        val keyword = data.get(AttributeType.KEYWORD_TEXT).asInstanceOf[StringAttribute]
+        val categories = data.get(AttributeType.CATEGORY_PRODUCTS_AND_SERVICES).asInstanceOf[IntegerSetAttribute]
+        var categoriesString = "(none)"
+        if (categories != null && categories.getValue != null) {
+          categoriesString = categories.getValue.mkString(", ")
+        }
+        val averageMonthlySearches = data.get(AttributeType.SEARCH_VOLUME).asInstanceOf[LongAttribute]
+          .getValue
+        println("Keyword with text '" + keyword.getValue + "', and average monthly search volume '" + 
+          averageMonthlySearches + 
+          "' was found with categories: " + 
+          categoriesString)
+        map.put(keyword.getValue, averageMonthlySearches.toString)
+      }
+    } else {
+      println("No related keywords were found.")
+    }
+    map
+  }
+  def iterateGroups(adWordsServices: AdWordsServices, session: AdWordsSession, campaignId: java.lang.Long) {
+    val adGroupService = adWordsServices.get(session, classOf[AdGroupServiceInterface])
+    val PAGE_SIZE = 200
+    var offset = 0
+    var morePages = true
+    val builder = new SelectorBuilder()
+    var selector = builder.fields(AdGroupField.Id, AdGroupField.Name).orderAscBy(AdGroupField.Name)
+      .offset(offset)
+      .limit(PAGE_SIZE)
+      .equals(AdGroupField.CampaignId, campaignId.toString)
+      .build()
+    while (morePages) {
+      val page = adGroupService.get(selector)
+      if (page.getEntries != null) {
+        for (adGroup <- page.getEntries) {
+          //put login on adgroup level
+
+          val keywords = getKeywords(adWordsServices, session, adGroup.getId)
+          
+          for (word <- keywords.asScala) {
+            println(word)
+           val res= getKeyWordSuggetions(adWordsServices, session, word)
+          }
+          println("Ad group with name \"" + adGroup.getName + "\" and id \"" +
+            adGroup.getId +
+            "\" was found.")
+        }
+      } else {
+        println("No ad groups were found.")
+      }
+      offset += PAGE_SIZE
+      selector = builder.increaseOffsetBy(PAGE_SIZE).build()
+      morePages = offset < page.getTotalNumEntries
+    }
+  }
+  def estimates(adWordsServices: AdWordsServices, session: AdWordsSession, key: String) {
 
     import com.google.api.ads.adwords.axis.factory.AdWordsServices
     import com.google.api.ads.adwords.axis.v201509.cm.Criterion
@@ -232,26 +316,21 @@ object Utils {
     import java.util.ArrayList
     import java.util.List
     import scala.collection.JavaConverters._
+
     val trafficEstimatorService = adWordsServices.get(session, classOf[TrafficEstimatorServiceInterface])
     val keywords = new ArrayList[Keyword]()
     val marsCruiseKeyword = new Keyword()
-    marsCruiseKeyword.setText("pricing intelligence")
+    marsCruiseKeyword.setText(key)
     marsCruiseKeyword.setMatchType(KeywordMatchType.PHRASE)
     keywords.add(marsCruiseKeyword)
-    val cheapCruiseKeyword = new Keyword()
-    cheapCruiseKeyword.setText("woocommerce dynamic pricing & discounts")
-    cheapCruiseKeyword.setMatchType(KeywordMatchType.PHRASE)
-    keywords.add(cheapCruiseKeyword)
+
     val keywordEstimateRequests = new ArrayList[KeywordEstimateRequest]()
     for (keyword <- keywords.asScala) {
       val keywordEstimateRequest = new KeywordEstimateRequest()
       keywordEstimateRequest.setKeyword(keyword)
       keywordEstimateRequests.add(keywordEstimateRequest)
     }
-    val negativeKeywordEstimateRequest = new KeywordEstimateRequest()
-    negativeKeywordEstimateRequest.setKeyword(new Keyword(null, null, null, "hiking tour", KeywordMatchType.BROAD))
-    negativeKeywordEstimateRequest.setIsNegative(true)
-    keywordEstimateRequests.add(negativeKeywordEstimateRequest)
+
     val adGroupEstimateRequests = new ArrayList[AdGroupEstimateRequest]()
     val adGroupEstimateRequest = new AdGroupEstimateRequest()
     adGroupEstimateRequest.setKeywordEstimateRequests(keywordEstimateRequests.toArray(Array()))
@@ -266,6 +345,7 @@ object Utils {
     english.setId(1000L)
     campaignEstimateRequest.setCriteria(Array(unitedStates, english))
     campaignEstimateRequests.add(campaignEstimateRequest)
+
     val selector = new TrafficEstimatorSelector()
     selector.setCampaignEstimateRequests(campaignEstimateRequests.toArray(Array()))
     val result = trafficEstimatorService.get(selector)
@@ -278,9 +358,7 @@ object Utils {
         println(bc.getAmount)
         val keyword = keywordEstimateRequests.get(i).getKeyword
         val keywordEstimate = keywordEstimates(i)
-        if (true == keywordEstimateRequests.get(i).getIsNegative) {
-          //continue
-        }
+
         val meanAverageCpc = calculateMean(keywordEstimate.getMin.getAverageCpc, keywordEstimate.getMax.getAverageCpc)
         val meanAveragePosition = calculateMean(keywordEstimate.getMin.getAveragePosition, keywordEstimate.getMax.getAveragePosition)
         val meanClicks = calculateMean(keywordEstimate.getMin.getClicksPerDay, keywordEstimate.getMax.getClicksPerDay)
@@ -416,7 +494,8 @@ object Utils {
       println("]")
     }
   }
-  def getKeywords(adWordsServices: AdWordsServices, session: AdWordsSession, adGroupId: java.lang.Long) {
+  def getKeywords(adWordsServices: AdWordsServices, session: AdWordsSession, adGroupId: java.lang.Long) = {
+    val list = new ArrayList[String]
     val PAGE_SIZE = 100
     val adGroupCriterionService = adWordsServices.get(session, classOf[AdGroupCriterionServiceInterface])
     var offset = 0
@@ -439,6 +518,7 @@ object Utils {
           val keyword = adGroupCriterionResult.getCriterion.asInstanceOf[Keyword]
           System.out.printf("Keyword with text '%s', match type '%s', criteria type '%s', and ID %d was found.%n",
             keyword.getText, keyword.getMatchType, keyword.getType, keyword.getId)
+          list.add(keyword.getText)
         }
       } else {
         println("No ad group criteria were found.")
@@ -447,7 +527,7 @@ object Utils {
       selector = builder.increaseOffsetBy(PAGE_SIZE).build()
       morePages = offset < page.getTotalNumEntries
     }
-
+    list
   }
 
   def updateKeyword(adWordsServices: AdWordsServices, session: AdWordsSession, adGroupId: java.lang.Long, keywordId: java.lang.Long, bidAmount: Long) {
@@ -502,66 +582,59 @@ object Utils {
         "\" was updated.")
     }
   }
-  //  def getMoreKeywords(keyword:String, adWordsServices: AdWordsServices, session: AdWordsSession)={
-  //        val targetingIdeaService =
-  //        adWordsServices.get(session, classOf[TargetingIdeaServiceInterface]);
-  //
-  //    // Create selector.
-  //    val selector = new TargetingIdeaSelector();
-  //    selector.setRequestType(RequestType.IDEAS);
-  //    selector.setIdeaType(IdeaType.KEYWORD);
-  //    val att:Array[AttributeType] =Array(AttributeType.KEYWORD_TEXT, AttributeType.SEARCH_VOLUME, AttributeType.CATEGORY_PRODUCTS_AND_SERVICES)
-  //    selector.setRequestedAttributeTypes(att);
-  //
-  //    // Set selector paging (required for targeting idea service).
-  //    val paging = new Paging();
-  //    paging.setStartIndex(0);
-  //    paging.setNumberResults(10);
-  //    selector.setPaging(paging);
-  //
-  //    // Create related to query search parameter.
-  //    val relatedToQuerySearchParameter = new RelatedToQuerySearchParameter();
-  //    relatedToQuerySearchParameter.setQueries(Array[ String] {"mars cruise"});
-  //
-  //    // Language setting (optional).
-  //    // The ID can be found in the documentation:
-  //    //   https://developers.google.com/adwords/api/docs/appendix/languagecodes
-  //    // See the documentation for limits on the number of allowed language parameters:
-  //    //   https://developers.google.com/adwords/api/docs/reference/latest/TargetingIdeaService.LanguageSearchParameter
-  //    val languageParameter = new LanguageSearchParameter();
-  //    val english = new Language();
-  //    english.setId(1000L);
-  //    languageParameter.setLanguages(Array[ Language] {english});
-  //
-  //    selector.setSearchParameters(
-  //        Array( relatedToQuerySearchParameter, languageParameter));
-  //
-  //    // Get related keywords.
-  //    val page = targetingIdeaService.get(selector);
-  //
-  //    // Display related keywords.
-  //    if (page.getEntries() != null && page.getEntries().length > 0) {
-  //      for ( targetingIdea <- page.getEntries()) {
-  //        val data = Maps.toMap(targetingIdea.getData());
-  //        val keyword:StringAttribute = data.get(AttributeType.KEYWORD_TEXT);
-  //
-  //        val categories:IntegerSetAttribute =
-  //             data.get(AttributeType.CATEGORY_PRODUCTS_AND_SERVICES);
-  //        var categoriesString = "(none)";
-  //        if (categories != null && categories.getValue() != null) {
-  //          categoriesString = Joiner.on(", ").join(Ints.asList(categories.getValue()));
-  //        }
-  //        val averageMonthlySearches =
-  //            ((LongAttribute) data.get(AttributeType.SEARCH_VOLUME))
-  //                .getValue();
-  //        System.out.println("Keyword with text '" + keyword.getValue()
-  //            + "', and average monthly search volume '" + averageMonthlySearches
-  //            + "' was found with categories: " + categoriesString);
-  //      }
-  //    } else {
-  //      System.out.println("No related keywords were found.");
-  //    }
-  //  }
+  def getMoreKeywords(keyword: String, adWordsServices: AdWordsServices, session: AdWordsSession) = {
+    val targetingIdeaService =
+      adWordsServices.get(session, classOf[TargetingIdeaServiceInterface]);
+
+    // Create selector.
+    val selector = new TargetingIdeaSelector();
+    selector.setRequestType(RequestType.IDEAS);
+    selector.setIdeaType(IdeaType.KEYWORD);
+    val att: Array[AttributeType] = Array(AttributeType.KEYWORD_TEXT, AttributeType.SEARCH_VOLUME, AttributeType.CATEGORY_PRODUCTS_AND_SERVICES)
+    selector.setRequestedAttributeTypes(att);
+
+    // Set selector paging (required for targeting idea service).
+    val paging = new Paging();
+    paging.setStartIndex(0);
+    paging.setNumberResults(10);
+    selector.setPaging(paging);
+
+    // Create related to query search parameter.
+    val relatedToQuerySearchParameter = new RelatedToQuerySearchParameter();
+    relatedToQuerySearchParameter.setQueries(Array[String] { keyword });
+
+    val languageParameter = new LanguageSearchParameter();
+    val english = new Language();
+    english.setId(1000L);
+    languageParameter.setLanguages(Array[Language] { english });
+
+    selector.setSearchParameters(
+      Array(relatedToQuerySearchParameter, languageParameter));
+
+    // Get related keywords.
+    val page = targetingIdeaService.get(selector);
+
+    // Display related keywords.
+    if (page.getEntries() != null && page.getEntries().length > 0) {
+      for (targetingIdea <- page.getEntries()) {
+        val data = Maps.toMap(targetingIdea.getData());
+        val keyword: StringAttribute = data.get(AttributeType.KEYWORD_TEXT);
+
+        val categories: IntegerSetAttribute =
+          data.get(AttributeType.CATEGORY_PRODUCTS_AND_SERVICES);
+        var categoriesString = "(none)";
+        if (categories != null && categories.getValue() != null) {
+          categoriesString = categories.getValue.mkString(",")
+        }
+        val averageMonthlySearches = data.get(AttributeType.SEARCH_VOLUME).asInstanceOf[LongAttribute].getValue()
+        println("Keyword with text '" + keyword.getValue()
+          + "', and average monthly search volume '" + averageMonthlySearches
+          + "' was found with categories: " + categoriesString);
+      }
+    } else {
+      System.out.println("No related keywords were found.");
+    }
+  }
 
   //GetKeywordBidSimulations  
   def estimateTrafic(adGroupId: Long, criterionId: Long, keyword: String, adWordsServices: AdWordsServices, session: AdWordsSession) = {

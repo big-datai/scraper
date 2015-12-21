@@ -75,6 +75,8 @@ public class BigMessage extends Message implements Serializable {
 		firstGglPrice = new String(ms.firstGglPrice);
 		gglName = new String(ms.gglName);
 		condition=new String(ms.condition);
+		uBound=new String(ms.uBound);
+		lBound=new String(ms.lBound);
 	}
 
 	public static BigMessage string2Message(byte[] message) {
@@ -161,6 +163,8 @@ public class BigMessage extends Message implements Serializable {
 		jo.addProperty("firstGglPrice", firstGglPrice);
 		jo.addProperty("gglName", gglName);
 		jo.addProperty("condition", condition);
+		jo.addProperty("uBound", uBound);
+		jo.addProperty("lBound", lBound);
 		return jo;
 	}
 

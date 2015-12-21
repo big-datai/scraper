@@ -26,7 +26,7 @@ CREATE TABLE adwords.adgroups (
 );
 
 CREATE TABLE adwords.adtexts (
-	group_id BigInt,
+	group_id bigint,
     headline text,
     desc1 text,
     desc2 text,

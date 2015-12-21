@@ -40,7 +40,7 @@ public class ReadCSV {
 				 * msg[7]; upc = msg[8]; sku = msg[9]; otherId = msg[10];
 				 */
 
-				if (msg == null || msg.length != CSV2Kafka.COL_NUM && msg.length != CSV2Kafka.COL_NUM+1) {
+				if (msg == null || msg.length != CSV2Kafka.COL_NUM && msg.length != CSV2Kafka.COL_NUM+1 && msg.length!= CSV2Kafka.COL_NUM+2 && msg.length!= CSV2Kafka.COL_NUM+3) {
 					System.out.println(msg[0]);
 					continue;
 				}
@@ -71,7 +71,15 @@ public class ReadCSV {
 					// System.out.println(msg[10]);
 					if (msg.length == CSV2Kafka.COL_NUM+1){
 						m.locale=msg[9];
+					}else if (msg.length == CSV2Kafka.COL_NUM+2){
+						m.lBound=msg[9];
+						m.uBound=msg[10];
+					}else if (msg.length == CSV2Kafka.COL_NUM+3){
+						m.locale=msg[9];
+						m.lBound=msg[10];
+						m.uBound=msg[11];
 					}
+					
 					if (cnt > 1){
 						m.domain=UStringUtils.getDomainName(msg[3]);
 					}
