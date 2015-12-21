@@ -10,7 +10,13 @@
         <appender-ref ref="CONSOLE"/>
     </root>
 
-    <logger name="akka.cluster" level="INFO"/>
-    <logger name="akka.serialization" level="INFO"/>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.out</target>
+        <encoder>
+            <pattern>%X{akkaTimestamp} %-5level[%thread] %logger{0} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="akka" level="INFO"/>
     <logger name="eventstore.tcp" level="INFO"/>
 </configuration>

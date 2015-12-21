@@ -4,10 +4,11 @@ import akka.actor.{ActorRef, Actor}
 import akka.actor.Actor.Receive
 import com.datastax.driver.core.Cluster
 import com.deepricer.adwords.CampaignReadActor.FindAndAdd
-import com.deepricer.adwords.domain.Campaigns
+import com.deepricer.adwords.domain.CampaignCassandra
 import com.deepricer.adwords.google.CampaignActor.AddCampaign
 
 import com.websudos.phantom.dsl._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
  * Created by admin on 12/14/15.
@@ -17,15 +18,18 @@ object CampaignReadActor {
 }
 
 class CampaignReadActor(cluster: Cluster, campaignActor: ActorRef) extends Actor {
-  import context.dispatcher
-  import akka.pattern.pipe
 
-  implicit val keySpace = KeySpace(Keyspaces.adwords)
-  implicit val session = cluster.connect()
+//  implicit val session = cluster.connect(Keyspaces.adwords)
 
   def findAndAddCampaign(storeId: String) = {
 
-    Campaigns.select.where(_.storeId eqs storeId).fetch map {
+//    println(session.execute("select * from campaigns").all().iterator().next().toString)
+
+//    Campaigns.select.where(_.storeId eqs storeId).fetch
+
+    CampaignCassandra.c(storeId) map (cas => cas.foreach(ca => println(ca)))
+
+    CampaignCassandra.c(storeId) map {
       _.foreach(campaign => campaignActor ! AddCampaign(campaign))
     }
 

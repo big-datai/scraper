@@ -1,6 +1,6 @@
 package com.deepricer.adwords.google
 
-import akka.actor.Actor
+import akka.actor.{ActorLogging, Actor}
 import com.deepricer.adwords.domain.CampaignCassandra
 import com.deepricer.adwords.google.CampaignActor.{SetCampaign, AddCampaign}
 import com.google.api.ads.adwords.axis.factory.AdWordsServices
@@ -17,7 +17,7 @@ object CampaignActor {
   case class SetCampaign(campaignCassandra: CampaignCassandra)
 }
 
-class CampaignActor(session: AdWordsSession) extends Actor {
+class CampaignActor(session: AdWordsSession) extends Actor with ActorLogging {
 
   def addCampaign(campaignCassandra: CampaignCassandra, operator: Operator) = {
     val adWordsServices: AdWordsServices = new AdWordsServices
