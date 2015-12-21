@@ -27,11 +27,12 @@ class AdTextActor(session: AdWordsSession) extends Actor with ActorLogging {
     // Create text ads.
     val textAd = new TextAd
     textAd.setHeadline(csvLine.adHeadline)
-    textAd.setDescription1("")
-    textAd.setDescription2("")
+    textAd.setDescription1(csvLine.ad1Line)
+    textAd.setDescription2(csvLine.adLine2)
     textAd.setDisplayUrl(csvLine.adDisplayUrl)
     textAd.setFinalUrls(Array[String] {csvLine.adFinalUrl})
 
+//    csvLine.suggestion.
     // Create ad group ad.
     val textAdGroupAd = new AdGroupAd
     textAdGroupAd.setAdGroupId(groupId)

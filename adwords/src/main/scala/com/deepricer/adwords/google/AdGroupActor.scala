@@ -38,8 +38,8 @@ class AdGroupActor(session: AdWordsSession, adTextActor: ActorRef) extends Actor
 
     var i: Long = 1L
     result.getValue foreach {  group =>
-//      adTextActor ! AddAdText(csvLine, group.getId)
-      createAdGroup(new AdWordsServices, session, group.getId, group.getName)
+      adTextActor ! AddAdText(csvLine, group.getId)
+//      createAdGroup(new AdWordsServices, session, group.getId, group.getName)
     }
 
   }
