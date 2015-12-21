@@ -409,7 +409,7 @@ public class GoogleAds implements Runnable {
 								if (midPrice-lBound>1){sugPrice=String.valueOf(midPrice-1);}
 								else {sugPrice=String.valueOf(midPrice-((midPrice-lBound)/2));}
 						}
-						else sugPrice="non";			
+						else sugPrice=String.valueOf(lBound);			
 			}else sugPrice=myPrice;
 			map.put("suggestion", sugPrice);	
 			//End of Suggested Price Part
