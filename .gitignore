@@ -1,9 +1,11 @@
- adwords/.cache
- utils/.cache
- workers/.cache
- workers/target*
- adwords/target*
- utils/target*
+utils/.classpath
+adwords/.classpath
+adwords/.cache
+utils/.cache
+workers/.cache
+workers/target*
+adwords/target*
+utils/target*
 *.DS_Store*
 *.cache*
 *target*
