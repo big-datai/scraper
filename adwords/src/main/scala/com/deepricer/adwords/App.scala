@@ -1,16 +1,15 @@
 package com.deepricer.adwords
 
 import java.lang.Boolean.getBoolean
-
-import akka.actor.{Props, ActorSystem}
+import akka.actor.{ Props, ActorSystem }
 import com.deepricer.adwords.CampaignReadActor.FindAndAdd
 import com.deepricer.adwords.google.AdGroupActor.AddAdGroup
-import com.deepricer.adwords.google.{AdTextActor, AdGroupActor, CampaignActor}
-import com.deepricer.adwords.config.{AdWordsConfig, ConfigCassandraCluster}
+import com.deepricer.adwords.google.{ AdTextActor, AdGroupActor, CampaignActor }
+import com.deepricer.adwords.config.{ AdWordsConfig, ConfigCassandraCluster }
 import com.deepricer.adwords.utils.CSVUtil
 import com.typesafe.config.ConfigFactory
-
 import scala.io.Source
+import com.deepricer.adwords.google.AdKeywordActor
 
 trait Bootable {
   /**
@@ -29,11 +28,12 @@ trait Bootable {
 object Main extends App with ConfigCassandraCluster with AdWordsConfig {
   import akka.actor.ActorDSL._
   implicit lazy val system = ActorSystem("ClusterSystem", ConfigFactory.load())
-//  val findAndAdd = system.actorOf(Props(new CampaignActor(OAuth2Credential.session)))
-//  val scan = system.actorOf(Props(new CampaignReadActor(cluster, findAndAdd)))
+  //  val findAndAdd = system.actorOf(Props(new CampaignActor(OAuth2Credential.session)))
+  //  val scan = system.actorOf(Props(new CampaignReadActor(cluster, findAndAdd)))
   val adText = system.actorOf(Props(new AdTextActor(OAuth2Credential.session)))
-  val adGroup = system.actorOf(Props(new AdGroupActor(OAuth2Credential.session, adText)))
 
+  val key = system.actorOf(Props(new AdKeywordActor(OAuth2Credential.session)))
+  val adGroup = system.actorOf(Props(new AdGroupActor(OAuth2Credential.session, adText, key)))
   // we don't want to bother with the ``ask`` pattern, so
   // we set up sender that only prints out the responses to
   // be implicitly available for ``tell`` to pick up.
@@ -56,14 +56,14 @@ object Main extends App with ConfigCassandraCluster with AdWordsConfig {
       val system = ActorSystem("ClusterSystem", config)
       // Create an actor that handles cluster domain events
 
-//      val findAndAdd = system.actorOf(Props(new CampaignActor(OAuth2Credential.session)))
-//      val scan = system.actorOf(Props(new CampaignReadActor(cluster, findAndAdd)))
-//
-//      scan ! FindAndAdd("www.bb.com")
+      //      val findAndAdd = system.actorOf(Props(new CampaignActor(OAuth2Credential.session)))
+      //      val scan = system.actorOf(Props(new CampaignReadActor(cluster, findAndAdd)))
+      //
+      //      scan ! FindAndAdd("www.bb.com")
 
       val adText = system.actorOf(Props(new AdTextActor(OAuth2Credential.session)))
-      val adGroup = system.actorOf(Props(new AdGroupActor(OAuth2Credential.session, adText)))
-
+      val key = system.actorOf(Props(new AdKeywordActor(OAuth2Credential.session)))
+      val adGroup = system.actorOf(Props(new AdGroupActor(OAuth2Credential.session, adText, key)))
 
       files.toList.map { file =>
         val bufferedSource = Source.fromFile(file)
@@ -83,18 +83,17 @@ object Main extends App with ConfigCassandraCluster with AdWordsConfig {
     log("Starting Akka...")
     log("Running Akka " + ActorSystem.Version)
     startup(Seq("2551"), args)
-//    val bufferedSource = Source.fromFile("/Users/admin/Downloads/firstClient.csv")
-//    for (line <- bufferedSource.getLines()) {
-//      val csvLine = CSVUtil.csvTo(line)
-//    }
-//    bufferedSource.close()
+    //    val bufferedSource = Source.fromFile("/Users/admin/Downloads/firstClient.csv")
+    //    for (line <- bufferedSource.getLines()) {
+    //      val csvLine = CSVUtil.csvTo(line)
+    //    }
+    //    bufferedSource.close()
 
     //MPN	brand	bid	Suggestion	lbound	ubound	url	ad headline	Ad 1 line	Ad line 2	Ad display url	Ad final url	Campaign ID	Campaign budget
     log("Successfully started Akka")
 
     system.terminate()
   }
-
 
   private def banner = """
 ==============================================================================

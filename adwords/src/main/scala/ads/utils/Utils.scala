@@ -151,9 +151,10 @@ object Utils {
         val averageMonthlySearches = data.get(AttributeType.SEARCH_VOLUME).asInstanceOf[LongAttribute]
           .getValue
         println("Keyword with text '" + keyword.getValue + "', and average monthly search volume '" + 
-          averageMonthlySearches + 
-          "' was found with categories: " + 
-          categoriesString)
+          averageMonthlySearches)
+//          + 
+//          "' was found with categories: " + 
+//          categoriesString)
         map.put(keyword.getValue, averageMonthlySearches.toString)
       }
     } else {
