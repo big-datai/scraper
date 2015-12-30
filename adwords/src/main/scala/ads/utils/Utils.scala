@@ -73,7 +73,7 @@ object Utils {
       val campaign = findCampaign("AffiliatesITD")
       println(campaign.getName + " id : " + campaign.getId)
 
-      //updateCampaignBids(adWordsServices, session, campaign.getId)
+      updateCampaignBids(adWordsServices, session, campaign.getId)
     } catch {
       case e => e.printStackTrace()
     }
@@ -161,7 +161,7 @@ object Utils {
   def updateCampaignBids(adWordsServices: AdWordsServices, session: AdWordsSession, campaignId: Long) {
     //Updates the CPC bids for a given campaign
     // current bid logic is : newBid = TopOfPageCpc*0.8
-    val query = "SELECT  AdGroupId,  AdGroupName, Id, QualityScore, Clicks, TopOfPageCpc, FirstPageCpc FROM KEYWORDS_PERFORMANCE_REPORT WHERE CampaignId =" + campaignId
+    val query = "SELECT  AdGroupId,  AdGroupName, Id, QualityScore, Clicks, TopOfPageCpc, FirstPageCpc FROM KEYWORDS_PERFORMANCE_REPORT WHERE AdGroupStatus !=REMOVED AND CampaignId =" + campaignId
     val reportingConfiguration = new ReportingConfiguration.Builder().skipReportHeader(true)
       .skipColumnHeader(true)
       .skipReportSummary(true)
@@ -187,12 +187,18 @@ object Utils {
         val bidAmount = {
           if (TopOfPageCpc != 0L)
             (TopOfPageCpc * 0.8).floor.toLong
-          else
+          else if (FirstPageCpc != 0L)
             FirstPageCpc.toLong
+          else
+            0L
         }
         println("TopOfPageCpc: " + TopOfPageCpc)
+        println("FirstPageCpc: " + FirstPageCpc)
         println("AdGroupId: " + AdGroupId + " AdGroupName: " + AdGroupName + " Id: " + Id + " bidAmount: " + bidAmount)
-        updateKeywordBid(adWordsServices, session, AdGroupId, Id, bidAmount)
+        if(bidAmount!=0L){
+          println("updating bidAmount to: " + bidAmount)
+          updateKeywordBid(adWordsServices, session, AdGroupId, Id, bidAmount)
+        }
         line = reader.readLine()
       }
     } finally {
