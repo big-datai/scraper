@@ -47,6 +47,8 @@ class AdTextActor(session: AdWordsSession) extends Actor with ActorLogging {
 
     // Add ads.
     val result = adGroupAdService.mutate(Array[AdGroupAdOperation](textAdGroupAdOperation))
+    
+    println(result)
   }
 
   override def receive: Receive = {

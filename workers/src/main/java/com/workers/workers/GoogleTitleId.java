@@ -207,13 +207,13 @@ public class GoogleTitleId implements Runnable {
 			HtmlPage shopping = wc.getPage(Utils.GGL_SRCH_URLS.get(ms.locale));
 			// for (String query : queries) {
 			// SEARCH GOOGLE FOR A SPECIFIC QUERY
-			String mpn=ms.mpn;
-			if(ms.domain.contains("kwaliteitparket")&&!mpn.isEmpty()&&!mpn.equals("0")){
-				mpn="0"+mpn;
+			String mpn = ms.mpn;
+			if (ms.domain.contains("kwaliteitparket") && !mpn.isEmpty() && !mpn.equals("0")) {
+				mpn = "0" + mpn;
 			}
-			boolean res=false;
-			if(!mpn.isEmpty()){
-			 res= search(shopping, ms, (ms.brand + " " + mpn).trim(), messages);
+			boolean res = false;
+			if (!mpn.isEmpty()) {
+				res = search(shopping, ms, (ms.brand + " " + mpn).trim(), messages);
 			}
 			// boolean res = search(shopping, ms, "\"" + ms.brand + "\"" + " " +
 			// "\"" + ms.mpn + "\"", messages);
@@ -365,11 +365,11 @@ public class GoogleTitleId implements Runnable {
 				if (msgTemp.url.isEmpty()) {
 					msgTemp.url = href;
 				}
-				////*[@id="os-sellers-table"]/tbody/tr[2]/td[1]/span/a
-				////*[@id="os-sellers-table"]/tbody/tr[2]/td[1]/span/a
-				msgTemp.gglName = competitors.getByXPath("//*[@id=\"os-sellers-table\"]/tbody/tr[" + i + "]/td[1]/span[1]/a/text()").get(0).toString()
-						.replace(" ", "_");
-				msgTemp.domain=UStringUtils.getDomainName(ms.url);
+				// //*[@id="os-sellers-table"]/tbody/tr[2]/td[1]/span/a
+				// //*[@id="os-sellers-table"]/tbody/tr[2]/td[1]/span/a
+				msgTemp.gglName = competitors.getByXPath("//*[@id=\"os-sellers-table\"]/tbody/tr[" + i + "]/td[1]/span[1]/a/text()").get(0)
+						.toString().replace(" ", "_");
+				msgTemp.domain = UStringUtils.getDomainName(ms.url);
 				String basePrice = ((HtmlSpan) competitors.getByXPath("//*[@id=\"os-sellers-table\"]/tbody/tr[" + i + "]/td[4]/span").get(0))
 						.asText();
 				msgTemp.price = basePrice.replaceAll(Utils.CURRENCY_SYMBOLS, "").trim();
@@ -402,7 +402,8 @@ public class GoogleTitleId implements Runnable {
 					msgTemp.totalPrice = Utils.parcePrice(totalPriceCleaned, msgTemp.locale);
 				}
 				messages.add(msgTemp);
-			} catch (java.lang.IndexOutOfBoundsException e) {}
+			} catch (java.lang.IndexOutOfBoundsException e) {
+			}
 		}
 
 		return messages;

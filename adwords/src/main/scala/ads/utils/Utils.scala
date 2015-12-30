@@ -71,8 +71,10 @@ object Utils {
     // Get the CampaignService.
     val campaignService = adWordsServices.get(session, classOf[CampaignServiceInterface]);
 
-    val campaign = findCampaign("itdeviceonline")
+    val campaign = findCampaign("AffiliatesITD")
     println(campaign.getName + " id : " + campaign.getId)
+    
+    
     updateCampaignBids(adWordsServices, session, campaign.getId)
     //updateKeywordBid(adWordsServices, session, 23716284536L, 142713060296L, 10000L)
     //AdGroupId: 23716284536 AdGroupName: 003-0508-02 Id: 142713060296 bidAmount: 0
@@ -118,7 +120,13 @@ object Utils {
 
     val biddingStrategyConfiguration = new BiddingStrategyConfiguration()
     val bid = new CpcBid()
-    bid.setBid(new Money(null, bidAmount))
+    
+    var b:Long=0
+    if(bidAmount>100000)
+      b=((bidAmount/10000)*10000)
+    else
+      b= 100000   
+    bid.setBid(new Money(null, b))
     biddingStrategyConfiguration.setBids(Array(bid))
     // biddingStrategyConfiguration.setBiddingStrategyName("")
     biddableAdGroupCriterion.setBiddingStrategyConfiguration(biddingStrategyConfiguration)

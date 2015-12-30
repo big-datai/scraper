@@ -28,14 +28,14 @@ class AdKeywordActor(session: AdWordsSession) extends Actor with ActorLogging {
     // Create keyword
     val keyword = new Keyword
     keyword.setText(csvLine.mpn)
-    keyword.setMatchType(KeywordMatchType.BROAD)
+    keyword.setMatchType(KeywordMatchType.PHRASE)
 
     // Create biddable ad group criterion
     val keywordBiddableAdGroupCriterion: BiddableAdGroupCriterion = new BiddableAdGroupCriterion
     keywordBiddableAdGroupCriterion.setAdGroupId(groupId)
     keywordBiddableAdGroupCriterion.setCriterion(keyword)
    val encodedFinalUrl = String.format(csvLine.adFinalUrl, URLEncoder.encode(keyword.getText, Charsets.UTF_8.name()))
-    keywordBiddableAdGroupCriterion.setFinalUrls(new UrlList(Array(encodedFinalUrl)))
+    //keywordBiddableAdGroupCriterion.setFinalUrls(new UrlList(Array(encodedFinalUrl)))
     keywordBiddableAdGroupCriterion.setUserStatus(UserStatus.PAUSED)
     //keywordBiddableAdGroupCriterion.setFinalUrls(new UrlList(Array[String](csvLine.adFinalUrl)))
 
