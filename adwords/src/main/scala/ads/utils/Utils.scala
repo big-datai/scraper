@@ -61,21 +61,22 @@ import java.util.ArrayList
 import scala.collection.JavaConverters._
 import java.util.HashMap
 
-
 object Utils {
 
   def main(args: Array[String]): Unit = {
+    try {
+      val session = getSession
+      val adWordsServices: AdWordsServices = new AdWordsServices
+      // Get the CampaignService.
+      val campaignService = adWordsServices.get(session, classOf[CampaignServiceInterface]);
 
-    val session = getSession
-    val adWordsServices: AdWordsServices = new AdWordsServices
-    // Get the CampaignService.
-    val campaignService = adWordsServices.get(session, classOf[CampaignServiceInterface]);
+      val campaign = findCampaign("AffiliatesITD")
+      println(campaign.getName + " id : " + campaign.getId)
 
-    val campaign = findCampaign("AffiliatesITD")
-    println(campaign.getName + " id : " + campaign.getId)
-    
-    
-    updateCampaignBids(adWordsServices, session, campaign.getId)
+      //updateCampaignBids(adWordsServices, session, campaign.getId)
+    } catch {
+      case e => e.printStackTrace()
+    }
     //updateKeywordBid(adWordsServices, session, 23716284536L, 142713060296L, 10000L)
     //AdGroupId: 23716284536 AdGroupName: 003-0508-02 Id: 142713060296 bidAmount: 0
     /*
@@ -120,12 +121,12 @@ object Utils {
 
     val biddingStrategyConfiguration = new BiddingStrategyConfiguration()
     val bid = new CpcBid()
-    
-    var b:Long=0
-    if(bidAmount>100000)
-      b=((bidAmount/10000)*10000)
+
+    var b: Long = 0
+    if (bidAmount > 100000)
+      b = ((bidAmount / 10000) * 10000)
     else
-      b= 100000   
+      b = 100000
     bid.setBid(new Money(null, b))
     biddingStrategyConfiguration.setBids(Array(bid))
     // biddingStrategyConfiguration.setBiddingStrategyName("")
@@ -224,9 +225,8 @@ object Utils {
   //    val result = adGroupCriterionService.mutate(operations)
   //  }
 
-  
-   def getKeyWordSuggetions(adWordsServices: AdWordsServices, session: AdWordsSession, word:String) ={
-    val map=new HashMap[String,String]
+  def getKeyWordSuggetions(adWordsServices: AdWordsServices, session: AdWordsSession, word: String) = {
+    val map = new HashMap[String, String]
     val targetingIdeaService = adWordsServices.get(session, classOf[TargetingIdeaServiceInterface])
     val selector = new TargetingIdeaSelector()
     selector.setRequestType(RequestType.IDEAS)
@@ -237,7 +237,7 @@ object Utils {
     paging.setNumberResults(10)
     selector.setPaging(paging)
     val relatedToQuerySearchParameter = new RelatedToQuerySearchParameter()
-    relatedToQuerySearchParameter.setQueries(Array("["+word+"]"))
+    relatedToQuerySearchParameter.setQueries(Array("[" + word + "]"))
     val languageParameter = new LanguageSearchParameter()
     val english = new Language()
     english.setId(1000L)
@@ -255,11 +255,11 @@ object Utils {
         }
         val averageMonthlySearches = data.get(AttributeType.SEARCH_VOLUME).asInstanceOf[LongAttribute]
           .getValue
-        println("Keyword with text '" + keyword.getValue + "', and average monthly search volume '" + 
+        println("Keyword with text '" + keyword.getValue + "', and average monthly search volume '" +
           averageMonthlySearches)
-//          + 
-//          "' was found with categories: " + 
-//          categoriesString)
+        //          + 
+        //          "' was found with categories: " + 
+        //          categoriesString)
         map.put(keyword.getValue, averageMonthlySearches.toString)
       }
     } else {
@@ -285,10 +285,10 @@ object Utils {
           //put login on adgroup level
 
           val keywords = getKeywords(adWordsServices, session, adGroup.getId)
-          
+
           for (word <- keywords.asScala) {
             println(word)
-           val res= getKeyWordSuggetions(adWordsServices, session, word)
+            val res = getKeyWordSuggetions(adWordsServices, session, word)
           }
           println("Ad group with name \"" + adGroup.getName + "\" and id \"" +
             adGroup.getId +

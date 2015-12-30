@@ -1,8 +1,8 @@
 package com.deepricer.adwords.google
 
-import akka.actor.{ActorLogging, Actor}
+import akka.actor.{ ActorLogging, Actor }
 import akka.actor.Actor.Receive
-import com.deepricer.adwords.domain.{CSVLine, AdTextCassandra}
+import com.deepricer.adwords.domain.{ CSVLine, AdTextCassandra }
 import com.deepricer.adwords.google.AdTextActor.AddAdText
 import com.google.api.ads.adwords.axis.factory.AdWordsServices
 import com.google.api.ads.adwords.axis.v201509.cm._
@@ -14,7 +14,7 @@ import com.google.api.ads.adwords.lib.client.AdWordsSession
 
 object AdTextActor {
   case class AddAdText(csvLine: CSVLine, groupId: Long)
-//  case class SetAdText(adTextCassandra: AdTextCassandra)
+  //  case class SetAdText(adTextCassandra: AdTextCassandra)
 }
 
 class AdTextActor(session: AdWordsSession) extends Actor with ActorLogging {
@@ -30,9 +30,9 @@ class AdTextActor(session: AdWordsSession) extends Actor with ActorLogging {
     textAd.setDescription1(csvLine.ad1Line)
     textAd.setDescription2(csvLine.adLine2)
     textAd.setDisplayUrl(csvLine.adDisplayUrl)
-    textAd.setFinalUrls(Array[String] {csvLine.adFinalUrl})
+    textAd.setFinalUrls(Array[String] { csvLine.adFinalUrl })
 
-//    csvLine.suggestion.
+    //    csvLine.suggestion.
     // Create ad group ad.
     val textAdGroupAd = new AdGroupAd
     textAdGroupAd.setAdGroupId(groupId)
@@ -46,13 +46,16 @@ class AdTextActor(session: AdWordsSession) extends Actor with ActorLogging {
     textAdGroupAdOperation.setOperator(operator)
 
     // Add ads.
-    val result = adGroupAdService.mutate(Array[AdGroupAdOperation](textAdGroupAdOperation))
-    
-    println(result)
+    try {
+      val result = adGroupAdService.mutate(Array[AdGroupAdOperation](textAdGroupAdOperation))
+    } catch {
+      case e: Exception => println(e)
+    }
+    //println(result)
   }
 
   override def receive: Receive = {
     case AddAdText(csvLine: CSVLine, groupId: Long) => adText(csvLine, groupId, Operator.ADD)
-//    case SetAdText(adTextCassandra: AdTextCassandra) => adText(adTextCassandra, Operator.SET)
+    //    case SetAdText(adTextCassandra: AdTextCassandra) => adText(adTextCassandra, Operator.SET)
   }
 }
