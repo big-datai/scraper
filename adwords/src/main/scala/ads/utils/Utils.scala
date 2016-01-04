@@ -184,15 +184,14 @@ object Utils {
         val Clicks = splitedLine.get(4)
         val TopOfPageCpc = Longs.tryParse(splitedLine.get(5))
         val FirstPageCpc = Longs.tryParse(splitedLine.get(6))
-//        val bidAmount = {
-//          if (TopOfPageCpc != 0L)
-//            (TopOfPageCpc * 0.8).floor.toLong
-//          else if (FirstPageCpc != 0L)
-//            FirstPageCpc.toLong
-//          else
-//            0L
-//        }
-        val bidAmount=FirstPageCpc+(TopOfPageCpc-FirstPageCpc)*0.5.toLong
+        val bidAmount = {
+          if ((TopOfPageCpc != 0L)&&(FirstPageCpc != 0L))
+            (FirstPageCpc+(TopOfPageCpc-FirstPageCpc)*0.5).floor.toLong
+          else if (FirstPageCpc != 0L)
+            FirstPageCpc.toLong
+          else
+            0L
+        }
         println("TopOfPageCpc: " + TopOfPageCpc)
         println("FirstPageCpc: " + FirstPageCpc)
         println("AdGroupId: " + AdGroupId + " AdGroupName: " + AdGroupName + " Id: " + Id + " bidAmount: " + bidAmount)
