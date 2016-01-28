@@ -85,8 +85,6 @@ public class ReadCSV {
 //						m.lBound=msg[10];
 //						m.uBound=msg[11];
 //						m.ggId=msg[12];
-//					}
-//					
 					
 					if (cnt > 1){
 						m.domain=UStringUtils.getDomainName(msg[3]);
