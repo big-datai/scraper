@@ -100,10 +100,10 @@ public class GoogleTitleId implements Runnable {
 
 					// get ids from google shopping
 					if (ms.ggId != null && !ms.ggId.equals("") && ms.ggId.matches("\\d+")) {
-						messages = getFirstSearch(ms, wc);
-					} else {
 						messages = new LinkedList<BigMessage>();
 						messages.add(ms);
+					} else {
+						messages = getFirstSearch(ms, wc);
 					}
 					// System.out.println(" RETURN FROM GOOGLE SEARCH WITH RESULTS : "
 					// + messages.size());
