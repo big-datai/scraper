@@ -45,6 +45,7 @@ public class ReadCSV {
 					continue;
 				}
 				try {
+					//ID,Category,Title,URL,Price,Brand,MPN,UPC,SKU,GID
 					BigMessage m = new BigMessage();
 					// m.setDomain(msg[0]);
 					// //ID,Category,Title,URL,Price,Brand,MPN,UPC,SKU
@@ -70,21 +71,22 @@ public class ReadCSV {
 					// m.setOtherID(msg[10]);
 					// System.out.println(msg[10]);
 					if (msg.length == CSV2Kafka.COL_NUM+1){
-						m.locale=msg[9];
-					}else if (msg.length == CSV2Kafka.COL_NUM+2){
-						m.lBound=msg[9];
-						m.uBound=msg[10];
-					}else if (msg.length == CSV2Kafka.COL_NUM+3){
-						m.locale=msg[9];
-						m.lBound=msg[10];
-						m.uBound=msg[11];
-					}else if (msg.length == CSV2Kafka.COL_NUM+4){
-						m.locale=msg[9];
-						m.lBound=msg[10];
-						m.uBound=msg[11];
-						m.ggId=msg[12];
+						m.ggId=msg[9];
 					}
-					
+//						else if (msg.length == CSV2Kafka.COL_NUM+2){
+//						m.lBound=msg[9];
+//						m.uBound=msg[10];
+//					}else if (msg.length == CSV2Kafka.COL_NUM+3){
+//						m.locale=msg[9];
+//						m.lBound=msg[10];
+//						m.uBound=msg[11];
+//					}else if (msg.length == CSV2Kafka.COL_NUM+4){
+//						m.locale=msg[9];
+//						m.lBound=msg[10];
+//						m.uBound=msg[11];
+//						m.ggId=msg[12];
+//					}
+//					
 					
 					if (cnt > 1){
 						m.domain=UStringUtils.getDomainName(msg[3]);

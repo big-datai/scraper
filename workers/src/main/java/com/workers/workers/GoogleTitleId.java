@@ -408,11 +408,11 @@ public class GoogleTitleId implements Runnable {
 				}
 				// TODO add store here to filter republished and competitors
 				// Refurbished Used
-				//if (ms.domain.contains("discountcomputercenter") || "discountcomputercenter".contains(ms.domain)
-				 if(!(msgTemp.details.contains("Refurbished") || msgTemp.details.contains("Used"))) {
+				// if (ms.domain.contains("discountcomputercenter") ||
+				// "discountcomputercenter".contains(ms.domain)
+				if (!(msgTemp.details.contains("Refurbished") || msgTemp.details.contains("Used"))) {
 					messages.add(msgTemp);
-				} 
-
+				}
 			} catch (java.lang.IndexOutOfBoundsException e) {
 			}
 		}
