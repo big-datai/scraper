@@ -70,10 +70,10 @@ object Utils {
       // Get the CampaignService.
       val campaignService = adWordsServices.get(session, classOf[CampaignServiceInterface]);
 
-      val campaign = findCampaign("AffiliatesITD")
+      val campaign = findCampaign("dewalt")
       println(campaign.getName + " id : " + campaign.getId)
 
-      updateCampaignBids(adWordsServices, session, campaign.getId)
+      //updateCampaignBids(adWordsServices, session, campaign.getId)
     } catch {
       case e => e.printStackTrace()
     }

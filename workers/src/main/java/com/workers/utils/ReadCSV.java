@@ -78,7 +78,13 @@ public class ReadCSV {
 						m.locale=msg[9];
 						m.lBound=msg[10];
 						m.uBound=msg[11];
+					}else if (msg.length == CSV2Kafka.COL_NUM+4){
+						m.locale=msg[9];
+						m.lBound=msg[10];
+						m.uBound=msg[11];
+						m.ggId=msg[12];
 					}
+					
 					
 					if (cnt > 1){
 						m.domain=UStringUtils.getDomainName(msg[3]);

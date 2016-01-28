@@ -99,7 +99,12 @@ public class GoogleTitleId implements Runnable {
 					System.out.println(" RECIEVED MESSAGES : " + inbox.addAndGet(1) + " thread id : " + Thread.currentThread().getId());
 
 					// get ids from google shopping
-					messages = getFirstSearch(ms, wc);
+					if (ms.ggId != null && !ms.ggId.equals("") && ms.ggId.matches("\\d+")) {
+						messages = getFirstSearch(ms, wc);
+					}else{
+						messages=new LinkedList<BigMessage>();
+						messages.add(ms);
+					}
 					// System.out.println(" RETURN FROM GOOGLE SEARCH WITH RESULTS : "
 					// + messages.size());
 
@@ -115,7 +120,7 @@ public class GoogleTitleId implements Runnable {
 						Double gglPrice = Double.parseDouble(Utils.parcePrice(msg.firstGglPrice, ms.locale));
 						Double pr = Double.parseDouble(Utils.parcePrice(msg.price, "en_US"));
 						if (gglID != null && !gglID.equals("") && gglID.matches("\\d+")) {
-							if ((pr > 0 && gglPrice > 0 && pr / gglPrice > 0.3 && pr / gglPrice < 3) || pr == 0.0 || gglPrice == 0.0 || pr < 10.0
+							if ((pr > 0 && gglPrice > 0 && (pr / gglPrice) > 0.5 && (pr / gglPrice) < 2) || pr == 0.0 || gglPrice == 0.0 || pr < 10.0
 									|| gglPrice < 10.0) {
 								bestCandid = msg;
 								messagesOfCompetitors = getCompetitors(bestCandid, wc);
@@ -401,7 +406,9 @@ public class GoogleTitleId implements Runnable {
 					String totalPriceCleaned = totalPrice.replaceAll(Utils.CURRENCY_SYMBOLS, ""); // remove
 					msgTemp.totalPrice = Utils.parcePrice(totalPriceCleaned, msgTemp.locale);
 				}
+				//TODO FOR andy check if in list of competitors 
 				messages.add(msgTemp);
+				
 			} catch (java.lang.IndexOutOfBoundsException e) {
 			}
 		}
