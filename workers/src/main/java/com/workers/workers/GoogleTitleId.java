@@ -101,8 +101,8 @@ public class GoogleTitleId implements Runnable {
 					// get ids from google shopping
 					if (ms.ggId != null && !ms.ggId.equals("") && ms.ggId.matches("\\d+")) {
 						messages = getFirstSearch(ms, wc);
-					}else{
-						messages=new LinkedList<BigMessage>();
+					} else {
+						messages = new LinkedList<BigMessage>();
 						messages.add(ms);
 					}
 					// System.out.println(" RETURN FROM GOOGLE SEARCH WITH RESULTS : "
@@ -406,9 +406,15 @@ public class GoogleTitleId implements Runnable {
 					String totalPriceCleaned = totalPrice.replaceAll(Utils.CURRENCY_SYMBOLS, ""); // remove
 					msgTemp.totalPrice = Utils.parcePrice(totalPriceCleaned, msgTemp.locale);
 				}
-				//TODO FOR andy check if in list of competitors 
-				messages.add(msgTemp);
-				
+				// TODO add store here to filter republished and competitors
+				// Refurbished Used
+				if (ms.domain.contains("discountcomputercenter") || "discountcomputercenter".contains(ms.domain)
+						&& !(msgTemp.details.contains("Refurbished") || msgTemp.details.contains("Used"))) {
+					messages.add(msgTemp);
+				} else {
+					messages.add(msgTemp);
+				}
+
 			} catch (java.lang.IndexOutOfBoundsException e) {
 			}
 		}
