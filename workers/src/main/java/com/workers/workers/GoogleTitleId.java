@@ -117,17 +117,21 @@ public class GoogleTitleId implements Runnable {
 					boolean priInd = true;
 					for (BigMessage msg : messages) {
 						String gglID = msg.ggId;
-						Double gglPrice = Double.parseDouble(Utils.parcePrice(msg.firstGglPrice, ms.locale));
-						Double pr = Double.parseDouble(Utils.parcePrice(msg.price, "en_US"));
+						//TO FILTER RIGHT CATEGORY
+						Double gglPrice=0.0;
+						if (msg.firstGglPrice != null && !"".equals(msg.firstGglPrice)) {
+							gglPrice = Double.parseDouble(Utils.parcePrice(msg.firstGglPrice, ms.locale));
+						}
+						Double origPrice = Double.parseDouble(Utils.parcePrice(msg.price, "en_US"));
 						if (gglID != null && !gglID.equals("") && gglID.matches("\\d+")) {
-							if ((pr > 0 && gglPrice > 0 && (pr / gglPrice) > 0.5 && (pr / gglPrice) < 2) || pr == 0.0 || gglPrice == 0.0 || pr < 10.0
+							if ((origPrice > 0 && gglPrice > 0 && (origPrice / gglPrice) > 0.5 && (origPrice / gglPrice) < 2) || origPrice == 0.0 || gglPrice == 0.0 || origPrice < 10.0
 									|| gglPrice < 10.0) {
 								bestCandid = msg;
 								messagesOfCompetitors = getCompetitors(bestCandid, wc);
 								break;
 							} else {
 								noprice.getAndIncrement();
-								System.out.println("+++ PROBLEM: PRICE DID NOT MATCH ORIGINAL: " + pr + " CANDIDATE PRICE : " + gglPrice
+								System.out.println("+++ PROBLEM: PRICE DID NOT MATCH ORIGINAL: " + origPrice + " CANDIDATE PRICE : " + gglPrice
 										+ " BRAND+MPN " + ms.brand + " " + ms.mpn);
 							}
 						}
@@ -410,9 +414,10 @@ public class GoogleTitleId implements Runnable {
 				// Refurbished Used
 				// if (ms.domain.contains("discountcomputercenter") ||
 				// "discountcomputercenter".contains(ms.domain)
-				if (!(msgTemp.details.contains("Refurbished") || msgTemp.details.contains("Used"))) {
-					messages.add(msgTemp);
-				}
+				// if (!(msgTemp.details.contains("Refurbished") ||
+				// msgTemp.details.contains("Used"))) {
+				messages.add(msgTemp);
+				// }
 			} catch (java.lang.IndexOutOfBoundsException e) {
 			}
 		}
