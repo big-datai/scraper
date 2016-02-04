@@ -68,20 +68,20 @@ public class GoogleAds implements Runnable {
 			wc.getOptions().setJavaScriptEnabled(true);
 			wc.getOptions().setCssEnabled(true);
 
-			final WebClient proxy = new WebClient(BrowserVersion.CHROME);
-			proxy.getOptions().setThrowExceptionOnScriptError(false);
-			proxy.getOptions().setJavaScriptEnabled(true);
-			proxy.getOptions().setCssEnabled(true);
-			HtmlPage shopping = proxy.getPage("https://proxy-us.hide.me/go.php?u=50gfghVrLr0P1jtKmGoOQcTGKj5IBD7V%2FGNftsgj&b=5");
-			final HtmlForm form = shopping.getForms().get(0);
-			HtmlSubmitInput button = form.getFirstByXPath("//*[@id=\"content\"]/form/input[2]");
-			final HtmlTextInput textField = form.getInputByName("u");
-			// Change the value of the text field
-			textField.setValueAttribute("https://www.google.com");
-			HtmlPage pageProxy = null;
-			pageProxy = button.click();
+//			final WebClient proxy = new WebClient(BrowserVersion.CHROME);
+//			proxy.getOptions().setThrowExceptionOnScriptError(false);
+//			proxy.getOptions().setJavaScriptEnabled(true);
+//			proxy.getOptions().setCssEnabled(true);
+//			HtmlPage shopping = proxy.getPage("https://proxy-us.hide.me/go.php?u=50gfghVrLr0P1jtKmGoOQcTGKj5IBD7V%2FGNftsgj&b=5");
+//			final HtmlForm form = shopping.getForms().get(0);
+//			HtmlSubmitInput button = form.getFirstByXPath("//*[@id=\"content\"]/form/input[2]");
+//			final HtmlTextInput textField = form.getInputByName("u");
+//			// Change the value of the text field
+//			textField.setValueAttribute("https://www.google.com");
+//			HtmlPage pageProxy = null;
+//			pageProxy = button.click();
 
-			// HtmlPage pageProxy = wc.getPage("https://google.com");
+			 HtmlPage pageProxy = wc.getPage("https://google.com");
 			while (true) {
 				BigMessage ms = null;
 				try {
