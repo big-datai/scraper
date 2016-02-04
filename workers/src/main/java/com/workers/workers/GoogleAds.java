@@ -318,8 +318,12 @@ public class GoogleAds implements Runnable {
 			int location = 0;
 			for (int i = 0; i < list.size(); i++) {
 				// TODO CHANGE FOR NEW DOMAIN
-				if (list.get(i).domain.toLowerCase().contains("itdevicesonline")
-						|| list.get(i).domain.toLowerCase().contains("water-softeners-filters")) {
+				if (list.get(i).html.toLowerCase().contains("itdevicesonline")
+						|| list.get(i).html.toLowerCase().contains("water-softeners-filters")
+						|| list.get(i).html.toLowerCase().contains("Water Softeners & Filters".toLowerCase())
+						|| list.get(i).html.toLowerCase().contains("Aquapure Water Filters".toLowerCase())
+						|| list.get(i).html.toLowerCase().contains("aquapurefilters")
+						) {
 					location = i;
 				}
 			}
