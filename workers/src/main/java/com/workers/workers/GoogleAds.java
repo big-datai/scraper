@@ -50,7 +50,8 @@ public class GoogleAds implements Runnable {
 	// public static AtomicInteger orpahn = new AtomicInteger();
 	public static String _ip = null;
 	private KafkaStream<byte[], byte[]> m_stream;
-	public static String host = "107.20.157.48";//"localhost";// "deepricer.com";
+	public static String host = "107.20.157.48";// "localhost";//
+												// "deepricer.com";
 
 	public GoogleAds(KafkaStream<byte[], byte[]> stream, String ip) {
 		_ip = ip;
@@ -67,22 +68,20 @@ public class GoogleAds implements Runnable {
 			wc.getOptions().setJavaScriptEnabled(true);
 			wc.getOptions().setCssEnabled(true);
 
-//			 final WebClient proxy = new WebClient(BrowserVersion.CHROME);
-//			 proxy.getOptions().setThrowExceptionOnScriptError(false);
-//			 proxy.getOptions().setJavaScriptEnabled(true);
-//			 proxy.getOptions().setCssEnabled(true);
-//			 HtmlPage shopping =
-//			 proxy.getPage("https://proxy-us.hide.me/go.php?u=50gfghVrLr0P1jtKmGoOQcTGKj5IBD7V%2FGNftsgj&b=5");
-//			 final HtmlForm form = shopping.getForms().get(0);
-//			 HtmlSubmitInput button =
-//			 form.getFirstByXPath("//*[@id=\"content\"]/form/input[2]");
-//			 final HtmlTextInput textField = form.getInputByName("u");
-//			 // Change the value of the text field
-//			 textField.setValueAttribute("https://www.google.com");
-//			 HtmlPage pageProxy = null;
-//			 pageProxy = button.click();
+			final WebClient proxy = new WebClient(BrowserVersion.CHROME);
+			proxy.getOptions().setThrowExceptionOnScriptError(false);
+			proxy.getOptions().setJavaScriptEnabled(true);
+			proxy.getOptions().setCssEnabled(true);
+			HtmlPage shopping = proxy.getPage("https://proxy-us.hide.me/go.php?u=50gfghVrLr0P1jtKmGoOQcTGKj5IBD7V%2FGNftsgj&b=5");
+			final HtmlForm form = shopping.getForms().get(0);
+			HtmlSubmitInput button = form.getFirstByXPath("//*[@id=\"content\"]/form/input[2]");
+			final HtmlTextInput textField = form.getInputByName("u");
+			// Change the value of the text field
+			textField.setValueAttribute("https://www.google.com");
+			HtmlPage pageProxy = null;
+			pageProxy = button.click();
 
-			HtmlPage pageProxy = wc.getPage("https://google.com");
+			// HtmlPage pageProxy = wc.getPage("https://google.com");
 			while (true) {
 				BigMessage ms = null;
 				try {
@@ -101,9 +100,9 @@ public class GoogleAds implements Runnable {
 
 					ms = BigMessage.string2Message(delivery);
 					if (ms.getMpn() != null && !ms.getMpn().isEmpty() && NumberUtils.isNumber(ms.mpn.replace("-", "")) && !ms.brand.equals("NONE")) {
-						searchAds(pageProxy, ms,  ms.mpn + " " + ms.brand, messages, ms.lBound,ms.uBound,ms.price);
+						searchAds(pageProxy, ms, ms.mpn + " " + ms.brand, messages, ms.lBound, ms.uBound, ms.price);
 					} else {
-						searchAds(pageProxy, ms, ms.mpn, messages, ms.lBound,ms.uBound,ms.price);
+						searchAds(pageProxy, ms, ms.mpn, messages, ms.lBound, ms.uBound, ms.price);
 					}
 					// messages = getFirstSearch(ms, wc);
 				} catch (Exception eee) {
@@ -128,7 +127,8 @@ public class GoogleAds implements Runnable {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static boolean searchAds(HtmlPage shopping, BigMessage ms, String query, LinkedList<BigMessage> messages,String lwb, String upb, String ttp) {
+	public static boolean searchAds(HtmlPage shopping, BigMessage ms, String query, LinkedList<BigMessage> messages, String lwb, String upb,
+			String ttp) {
 		// System.out.println("SEARCH QUERY IS: " + query);
 		try {
 			Thread.sleep((long) (Math.random() * SLEEP));
@@ -184,7 +184,7 @@ public class GoogleAds implements Runnable {
 			messages.add(parseAd(adsTop.get(i), ms, "BOTTOM", i, pbottom));
 		}
 
-		logicToCassandra(lwb,upb,ttp,messages, "", adsTop.size(), adsSide.size(), shoppings.size(), shoppingShrink.size(), shoppingShrink2.size());
+		logicToCassandra(lwb, upb, ttp, messages, "", adsTop.size(), adsSide.size(), shoppings.size(), shoppingShrink.size(), shoppingShrink2.size());
 		return true;
 	}
 
@@ -295,7 +295,8 @@ public class GoogleAds implements Runnable {
 		return out;
 	}
 
-	public static void logicToCassandra(String lwb,String upb,String ttp, LinkedList<BigMessage> list, String file, int top, int side, int shopping, int shrink, int shrink2) {
+	public static void logicToCassandra(String lwb, String upb, String ttp, LinkedList<BigMessage> list, String file, int top, int side,
+			int shopping, int shrink, int shrink2) {
 		BigMessage me = null;// new BigMessage();
 		try {
 			if (list.size() < 1) {
@@ -359,61 +360,75 @@ public class GoogleAds implements Runnable {
 				map.put("company" + String.valueOf(c), i + 1 + "-" + m.rating + " - " + m.details + " - " + m.domain);
 				map.put("company" + String.valueOf(c) + "_price", m.totalPrice);
 			}
-			
-			//Suggested Price Part
+
+			// Suggested Price Part
 			List<Double> tempList = new LinkedList<Double>();
-		
-			Double uBound = Double.parseDouble(upb);
-			Double lBound = Double.parseDouble(lwb);
+			Double uBound = 0.0, lBound = 0.0;
+			try {
+				uBound = Double.parseDouble(upb);
+				lBound = Double.parseDouble(lwb);
+			} catch (Exception e) {
+				uBound = 0.0;
+				lBound = 0.0;
+			}
 			String myPrice = ttp;
 			String sugPrice = "";
 
-			if (!myPrice.contains("non")){
-						if (uBound<Double.parseDouble(myPrice))
-							uBound = Double.parseDouble(myPrice);
-						else if (lBound<0.4*Double.parseDouble(myPrice))
-							lBound = Double.parseDouble(myPrice);
-						else if (lBound>Double.parseDouble(myPrice))
-							myPrice = String.valueOf(lBound);
-					}
-			
-			
+			if (!myPrice.contains("non")) {
+				if (uBound < Double.parseDouble(myPrice))
+					uBound = Double.parseDouble(myPrice);
+				else if (lBound < 0.4 * Double.parseDouble(myPrice))
+					lBound = Double.parseDouble(myPrice);
+				else if (lBound > Double.parseDouble(myPrice))
+					myPrice = String.valueOf(lBound);
+			}
+
 			for (int i = 0; i < list.size() && i < 8 && i < count; i++) {
-				
+
 				BigMessage m = list.get(i);
 				if (m.totalPrice.isEmpty())
 					continue;
 
-				if (m.domain.toLowerCase().contains("itdevicesonline")
-						||m.domain.toLowerCase().contains("water-softeners-filters")||m.totalPrice.contains("non")) 
-						{continue;} else 
-									{Double totPrice = Double.parseDouble(m.totalPrice);
-									tempList.add(totPrice);}	
+				if (m.domain.toLowerCase().contains("itdevicesonline") || m.domain.toLowerCase().contains("water-softeners-filters")
+						|| m.totalPrice.contains("non")) {
+					continue;
+				} else {
+					Double totPrice = Double.parseDouble(m.totalPrice);
+					tempList.add(totPrice);
+				}
 			}
-			
+
 			Collections.sort(tempList);
-			//Suggested Price Logic
-			if (tempList.size()>0){
-						Double midPrice=0.0;
-						Double minPrice = tempList.get(0);
-						if (tempList.size()%2==0)
-							{midPrice = (tempList.get(tempList.size()/2)+tempList.get((tempList.size()/2)-1))/2;}
-						else 
-						{midPrice = tempList.get(tempList.size()/2);}
-						if (minPrice>lBound && minPrice<uBound)
-							{sugPrice=String.valueOf(minPrice+1);}
-						else if (minPrice==lBound) {sugPrice=String.valueOf(minPrice);}
-						else if (minPrice>lBound && (0.8*minPrice)<=uBound) {sugPrice=String.valueOf(uBound);}
-						else if (Double.parseDouble(myPrice)<=midPrice && Double.parseDouble(myPrice)>=lBound){sugPrice=myPrice;}
-						else if (Double.parseDouble(myPrice)>midPrice && midPrice>lBound){
-								if (midPrice-lBound>1){sugPrice=String.valueOf(midPrice-1);}
-								else {sugPrice=String.valueOf(midPrice-((midPrice-lBound)/2));}
-						}
-						else sugPrice=String.valueOf(lBound);			
-			}else sugPrice=myPrice;
-			map.put("suggestion", sugPrice);	
-			//End of Suggested Price Part
-			
+			// Suggested Price Logic
+			if (tempList.size() > 0) {
+				Double midPrice = 0.0;
+				Double minPrice = tempList.get(0);
+				if (tempList.size() % 2 == 0) {
+					midPrice = (tempList.get(tempList.size() / 2) + tempList.get((tempList.size() / 2) - 1)) / 2;
+				} else {
+					midPrice = tempList.get(tempList.size() / 2);
+				}
+				if (minPrice > lBound && minPrice < uBound) {
+					sugPrice = String.valueOf(minPrice + 1);
+				} else if (minPrice == lBound) {
+					sugPrice = String.valueOf(minPrice);
+				} else if (minPrice > lBound && (0.8 * minPrice) <= uBound) {
+					sugPrice = String.valueOf(uBound);
+				} else if (Double.parseDouble(myPrice) <= midPrice && Double.parseDouble(myPrice) >= lBound) {
+					sugPrice = myPrice;
+				} else if (Double.parseDouble(myPrice) > midPrice && midPrice > lBound) {
+					if (midPrice - lBound > 1) {
+						sugPrice = String.valueOf(midPrice - 1);
+					} else {
+						sugPrice = String.valueOf(midPrice - ((midPrice - lBound) / 2));
+					}
+				} else
+					sugPrice = String.valueOf(lBound);
+			} else
+				sugPrice = myPrice;
+			map.put("suggestion", sugPrice);
+			// End of Suggested Price Part
+
 			Statement statement = QueryBuilder.insertInto("demo", "csv_products").values(map.keySet().toArray(new String[0]),
 					map.values().toArray(new String[0]));
 			System.out.println(counter.addAndGet(1) + " ++++" + line);

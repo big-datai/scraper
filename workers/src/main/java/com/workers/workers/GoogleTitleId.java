@@ -353,7 +353,7 @@ public class GoogleTitleId implements Runnable {
 		}
 
 		HtmlPage competitors = wc.getPage(Utils.GGL_SRCH_URLS.get(ms.locale) + "/product/" + gglID);
-		if (competitors.asText().contains(CAPTCHA)) {
+	 	if (competitors.asText().contains(CAPTCHA)) {
 			systemExitOnBlocked(ms);
 		}
 
