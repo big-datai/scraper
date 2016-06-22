@@ -1,4 +1,4 @@
-package com.workers.utils;
+/*package com.workers.utils;
 
 import java.rmi.RemoteException;
 
@@ -118,3 +118,4 @@ public class SimpleAds {
 
 	}
 }
+*/
