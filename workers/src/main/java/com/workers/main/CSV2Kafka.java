@@ -18,7 +18,7 @@ public class CSV2Kafka {
 	public static AtomicInteger m_counter = new AtomicInteger();
 	public static AtomicInteger m_exceptionsCounter = new AtomicInteger();
 	public static AtomicInteger m_life = new AtomicInteger();
-	public static String _ip = "54.83.9.85";
+	public static String _ip = "54.225.122.3";
 	public static String path2File = "/home/ec2-user/deepricer.csv";
 	public long time;
 	public String price_prop1 = "";
