@@ -43,7 +43,7 @@ public class GoogleTitleId implements Runnable {
 	public static AtomicInteger outBox = new AtomicInteger();
 	public static final String CAPTCHA = "systems have detected unusual traffic from your computer network",
 			GOOGLE_CAPTCHA = "We got blocked from ggl";
-	public static final int SLEEP = 17000;
+	public static final int SLEEP = 2000; // short sleep
 	public static AtomicInteger m_withSrchResults = new AtomicInteger();
 	public static AtomicInteger m_withCompResults = new AtomicInteger();
 	public static AtomicInteger noGoogleResults = new AtomicInteger();
